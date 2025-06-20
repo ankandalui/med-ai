@@ -5,16 +5,11 @@ import { PointerHighlight } from "@/components/ui/pointer-highlight";
 
 export function Hero() {
   const { t } = useTranslation();
-
   return (
     <section
-      className="min-h-screen flex items-center justify-center relative"
+      className="min-h-screen flex items-center justify-center relative bg-cover bg-no-repeat bg-scroll bg-[40%_center] md:bg-center"
       style={{
         backgroundImage: "url('/images/bg.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        backgroundAttachment: "scroll",
       }}
     >
       <div className="container mx-auto px-4 py-8">

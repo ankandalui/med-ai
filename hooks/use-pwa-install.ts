@@ -33,10 +33,32 @@ export function usePWAInstall() {
       return false;
     };
 
-    // If already installed, don't show install prompt
+    // Check for uninstallation by monitoring display mode changes
+    const checkIfUninstalled = () => {
+      const wasInstalled = localStorage.getItem("pwa-app-installed") === "true";
+      const standalone = window.matchMedia(
+        "(display-mode: standalone)"
+      ).matches;
+      const ios = (window.navigator as any).standalone === true;
+
+      // If was installed but no longer in standalone mode, it was uninstalled
+      if (wasInstalled && !standalone && !ios) {
+        setIsInstalled(false);
+        setIsInstallable(true);
+        localStorage.removeItem("pwa-app-installed");
+        // Clear other PWA-related storage
+        localStorage.removeItem("pwa-toast-last-shown");
+        localStorage.removeItem("pwa-toast-dismissed");
+      }
+    };
+
+    // Initial check
     if (checkIfInstalled()) {
       return;
     }
+
+    // Periodic check for uninstallation (every 5 seconds when app is active)
+    const uninstallCheckInterval = setInterval(checkIfUninstalled, 5000);
 
     const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
       // Prevent the mini-infobar from appearing on mobile
@@ -54,7 +76,6 @@ export function usePWAInstall() {
       // Persist installation state
       localStorage.setItem("pwa-app-installed", "true");
     };
-
     window.addEventListener(
       "beforeinstallprompt",
       handleBeforeInstallPrompt as EventListener
@@ -62,6 +83,7 @@ export function usePWAInstall() {
     window.addEventListener("appinstalled", handleAppInstalled);
 
     return () => {
+      clearInterval(uninstallCheckInterval);
       window.removeEventListener(
         "beforeinstallprompt",
         handleBeforeInstallPrompt as EventListener
