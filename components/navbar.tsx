@@ -55,11 +55,10 @@ export function Navbar() {
                 {item.name}
               </Link>
             ))}
-          </nav>{" "}
+          </nav>
           {/* Right Side - Theme, Language, Auth */}
           <div className="flex items-center space-x-2">
-            {" "}
-            {/* Desktop Auth Buttons (Hidden on mobile) */}
+            {/* Desktop Auth Buttons (Hidden on mobile) */}{" "}
             <div className="hidden md:flex items-center space-x-3">
               <Link href="/login">
                 <button className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2">

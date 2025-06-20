@@ -31,12 +31,12 @@ export function Hero() {
             <p className="text-xl sm:text-2xl md:text-2xl text-muted-foreground max-w-3xl mx-auto px-4 font-medium">
               {t("homepage.subtitle")}
             </p>
-          </div>
+          </div>{" "}
           {/* CTA Buttons */}
           <div className="flex gap-4 items-center flex-col sm:flex-row pt-4">
             <a
               className="w-full sm:w-auto rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 font-medium text-sm sm:text-base h-12 sm:h-14 px-8 shadow-lg"
-              href="/diagnosis"
+              href="/signup"
             >
               {t("homepage.getStarted")}
             </a>{" "}
