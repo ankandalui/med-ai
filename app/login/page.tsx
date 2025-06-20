@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Phone, Shield, X } from "lucide-react";
+import { Phone, Shield, X, User, UserCheck } from "lucide-react";
 
 interface LoginData {
   mobileNumber: string;
@@ -17,6 +17,9 @@ interface LoginData {
 
 export default function LoginPage() {
   const { t } = useTranslation();
+  const [userType, setUserType] = useState<"patient" | "health-worker">(
+    "patient"
+  );
   const [loginData, setLoginData] = useState<LoginData>({
     mobileNumber: "",
     otp: "",
@@ -115,7 +118,47 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Form Container */}
           <div className="bg-card backdrop-blur-xl rounded-3xl shadow-2xl border overflow-hidden">
+            {" "}
             <div className="p-8">
+              {/* User Type Toggle */}
+              <div className="mb-6">
+                <div className="text-center mb-4">
+                  <h1 className="text-3xl font-bold text-foreground mb-2">
+                    {t("navbar.login")}
+                  </h1>
+                  <p className="text-muted-foreground">
+                    Choose your account type and enter your mobile number
+                  </p>
+                </div>
+
+                <div className="flex rounded-lg border border-border overflow-hidden mb-6">
+                  <button
+                    type="button"
+                    onClick={() => setUserType("patient")}
+                    className={`flex-1 py-3 px-4 text-sm font-medium transition-colors flex items-center justify-center space-x-2 ${
+                      userType === "patient"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-background text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <User className="w-4 h-4" />
+                    <span>Patient</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUserType("health-worker")}
+                    className={`flex-1 py-3 px-4 text-sm font-medium transition-colors flex items-center justify-center space-x-2 ${
+                      userType === "health-worker"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-background text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <UserCheck className="w-4 h-4" />
+                    <span>Health Worker</span>
+                  </button>
+                </div>
+              </div>
+
               <form className="space-y-6">
                 {/* Mobile Number */}
                 <div className="space-y-2">

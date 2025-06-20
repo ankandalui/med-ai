@@ -78,5 +78,31 @@
       "otpRequired": "OTP आवश्यक है",
       "invalidOTP": "कृपया एक वैध 6 अंकों का OTP दर्ज करें"
     }
+  },
+  "patient": {
+    "gender": "लिंग",
+    "genderPlaceholder": "अपना लिंग चुनें",
+    "age": "उम्र",
+    "agePlaceholder": "अपनी उम्र दर्ज करें",
+    "dateOfBirth": "जन्म तिथि",
+    "dateOfBirthPlaceholder": "अपनी जन्म तिथि चुनें",
+    "location": "स्थान / क्षेत्र",
+    "locationPlaceholder": "अपना स्थान दर्ज करें",
+    "familyId": "पारिवारिक आईडी / राशन कार्ड नं.",
+    "familyIdPlaceholder": "पारिवारिक आईडी दर्ज करें (वैकल्पिक)",
+    "genderOptions": {
+      "male": "पुरुष",
+      "female": "महिला",
+      "other": "अन्य"
+    },
+    "completeRegistration": "पंजीकरण पूरा करें",
+    "registrationTitle": "अपनी प्रोफाइल पूरी करें",
+    "registrationSubtitle": "अपनी प्रोफाइल पूरी करके हमें बेहतर सेवा देने में मदद करें",
+    "validationErrors": {
+      "genderRequired": "लिंग आवश्यक है",
+      "ageRequired": "उम्र आवश्यक है",
+      "invalidAge": "कृपया एक वैध उम्र दर्ज करें (1-120)",
+      "locationRequired": "स्थान आवश्यक है"
+    }
   }
 }

@@ -32,6 +32,12 @@ interface FormData {
   phcSubcenter: string;
   designation: string;
   profilePhoto: File | null;
+  // Patient-specific fields
+  gender: string;
+  age: string;
+  dateOfBirth: string;
+  location: string;
+  familyId: string;
 }
 
 interface FormErrors {
@@ -47,7 +53,7 @@ interface OTPData {
 
 export default function SignUpPage() {
   const { t } = useTranslation();
-  const [formData, setFormData] = useState<FormData>({
+  const [userType, setUserType] = useState<"patient" | "health-worker">("health-worker");  const [formData, setFormData] = useState<FormData>({
     fullName: "",
     mobileNumber: "",
     aadharNumber: "",
@@ -56,6 +62,12 @@ export default function SignUpPage() {
     phcSubcenter: "",
     designation: "",
     profilePhoto: null,
+    // Patient-specific fields
+    gender: "",
+    age: "",
+    dateOfBirth: "",
+    location: "",
+    familyId: "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -89,7 +101,6 @@ export default function SignUpPage() {
   const validateOTP = (otp: string): boolean => {
     return /^\d{6}$/.test(otp);
   };
-
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
@@ -111,26 +122,44 @@ export default function SignUpPage() {
       );
     } else if (!validateAadharNumber(formData.aadharNumber)) {
       newErrors.aadharNumber = t("signup.validationErrors.invalidAadharNumber");
+    }    // Only validate health worker fields when userType is "health-worker"
+    if (userType === "health-worker") {
+      if (!formData.govHealthWorkerId.trim()) {
+        newErrors.govHealthWorkerId = t(
+          "signup.validationErrors.govHealthWorkerIdRequired"
+        );
+      }
+
+      if (!formData.areaVillage.trim()) {
+        newErrors.areaVillage = t("signup.validationErrors.areaVillageRequired");
+      }
+
+      if (!formData.phcSubcenter.trim()) {
+        newErrors.phcSubcenter = t(
+          "signup.validationErrors.phcSubcenterRequired"
+        );
+      }
+
+      if (!formData.designation) {
+        newErrors.designation = t("signup.validationErrors.designationRequired");
+      }
     }
 
-    if (!formData.govHealthWorkerId.trim()) {
-      newErrors.govHealthWorkerId = t(
-        "signup.validationErrors.govHealthWorkerIdRequired"
-      );
-    }
+    // Only validate patient fields when userType is "patient"
+    if (userType === "patient") {
+      if (!formData.gender) {
+        newErrors.gender = t("signup.validationErrors.genderRequired");
+      }
 
-    if (!formData.areaVillage.trim()) {
-      newErrors.areaVillage = t("signup.validationErrors.areaVillageRequired");
-    }
+      if (!formData.age.trim()) {
+        newErrors.age = t("signup.validationErrors.ageRequired");
+      } else if (isNaN(Number(formData.age)) || Number(formData.age) < 1 || Number(formData.age) > 120) {
+        newErrors.age = t("signup.validationErrors.invalidAge");
+      }
 
-    if (!formData.phcSubcenter.trim()) {
-      newErrors.phcSubcenter = t(
-        "signup.validationErrors.phcSubcenterRequired"
-      );
-    }
-
-    if (!formData.designation) {
-      newErrors.designation = t("signup.validationErrors.designationRequired");
+      if (!formData.location.trim()) {
+        newErrors.location = t("signup.validationErrors.locationRequired");
+      }
     }
 
     if (otpData.isOTPSent && !otpData.otp) {
@@ -270,10 +299,55 @@ export default function SignUpPage() {
                   </span>
                 </div>
               </div>
-            </div>
-
-            <div className="p-8 md:p-12">
+            </div>            <div className="p-8 md:p-12">
               <form className="space-y-8">
+                {/* User Type Toggle */}
+                <div className="mb-6">
+                  <div className="text-center mb-4">
+                    <h2 className="text-2xl font-bold text-foreground mb-2">
+                      {t("signup.title")}
+                    </h2>
+                    <p className="text-muted-foreground">
+                      Choose your account type and fill in your details
+                    </p>
+                  </div>
+                  
+                  <div className="flex rounded-lg border border-border overflow-hidden mb-6">
+                    <button
+                      type="button"
+                      onClick={() => setUserType("patient")}
+                      className={`flex-1 py-3 px-4 text-sm font-medium transition-colors flex items-center justify-center space-x-2 ${
+                        userType === "patient"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-background text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <User className="w-4 h-4" />
+                      <span>Patient</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setUserType("health-worker")}
+                      className={`flex-1 py-3 px-4 text-sm font-medium transition-colors flex items-center justify-center space-x-2 ${
+                        userType === "health-worker"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-background text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <UserCheck className="w-4 h-4" />
+                      <span>Health Worker</span>
+                    </button>
+                  </div>
+                  
+                  {userType === "patient" && (
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
+                      <p className="text-sm text-blue-700 dark:text-blue-300">
+                        <strong>Patient Registration:</strong> Please fill in your personal details. Health Worker fields will be hidden.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
                 {/* Profile Photo Section */}
                 <div className="text-center">
                   <div className="relative inline-block">
@@ -414,152 +488,293 @@ export default function SignUpPage() {
                     )}
                   </div>
 
-                  {/* Government Health Worker ID */}
+                  {/* Patient-specific fields - Only for Patients */}
+                  {userType === "patient" && (
+                    <>
+                      {/* Gender */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center">
+                          <User className="w-4 h-4 mr-2 text-blue-500" />
+                          {t("signup.patient.gender")}{" "}
+                          <span className="text-red-500 ml-1">*</span>
+                        </label>
+                        <div className="relative">
+                          <select
+                            value={formData.gender}
+                            onChange={(e) =>
+                              handleInputChange("gender", e.target.value)
+                            }
+                            className="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none cursor-pointer"
+                          >
+                            <option value="">
+                              {t("signup.patient.genderPlaceholder")}
+                            </option>
+                            <option value="male">{t("signup.patient.genderOptions.male")}</option>
+                            <option value="female">{t("signup.patient.genderOptions.female")}</option>
+                            <option value="other">{t("signup.patient.genderOptions.other")}</option>
+                          </select>
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <svg
+                              className="w-5 h-5 text-slate-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 9l-7 7-7-7"
+                              />
+                            </svg>
+                          </div>
+                          {errors.gender && (
+                            <div className="absolute inset-y-0 right-8 flex items-center pr-3">
+                              <AlertCircle className="w-5 h-5 text-red-500" />
+                            </div>
+                          )}
+                        </div>
+                        {errors.gender && (
+                          <p className="text-sm text-red-500 flex items-center mt-1">
+                            <AlertCircle className="w-4 h-4 mr-1" />
+                            {errors.gender}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Age */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center">
+                          <User className="w-4 h-4 mr-2 text-blue-500" />
+                          {t("signup.patient.age")}{" "}
+                          <span className="text-red-500 ml-1">*</span>
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            value={formData.age}
+                            onChange={(e) =>
+                              handleInputChange("age", e.target.value)
+                            }
+                            placeholder={t("signup.patient.agePlaceholder")}
+                            min="1"
+                            max="120"
+                            className="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                          />
+                          {errors.age && (
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                              <AlertCircle className="w-5 h-5 text-red-500" />
+                            </div>
+                          )}
+                        </div>
+                        {errors.age && (
+                          <p className="text-sm text-red-500 flex items-center mt-1">
+                            <AlertCircle className="w-4 h-4 mr-1" />
+                            {errors.age}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Location */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center">
+                          <MapPin className="w-4 h-4 mr-2 text-blue-500" />
+                          {t("signup.patient.location")}{" "}
+                          <span className="text-red-500 ml-1">*</span>
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={formData.location}
+                            onChange={(e) =>
+                              handleInputChange("location", e.target.value)
+                            }
+                            placeholder={t("signup.patient.locationPlaceholder")}
+                            className="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                          />
+                          {errors.location && (
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                              <AlertCircle className="w-5 h-5 text-red-500" />
+                            </div>
+                          )}
+                        </div>
+                        {errors.location && (
+                          <p className="text-sm text-red-500 flex items-center mt-1">
+                            <AlertCircle className="w-4 h-4 mr-1" />
+                            {errors.location}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Family ID (Optional) */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center">
+                          <CreditCard className="w-4 h-4 mr-2 text-blue-500" />
+                          {t("signup.patient.familyId")}
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={formData.familyId}
+                            onChange={(e) =>
+                              handleInputChange("familyId", e.target.value)
+                            }
+                            placeholder={t("signup.patient.familyIdPlaceholder")}
+                            className="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Government Health Worker ID - Only for Health Workers */}
+                  {userType === "health-worker" && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center">
+                        <UserCheck className="w-4 h-4 mr-2 text-blue-500" />
+                        {t("signup.govHealthWorkerId")}{" "}
+                        <span className="text-red-500 ml-1">*</span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={formData.govHealthWorkerId}
+                          onChange={(e) =>
+                            handleInputChange("govHealthWorkerId", e.target.value)
+                          }
+                          placeholder={t("signup.govHealthWorkerIdPlaceholder")}
+                          className="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                        />
+                        {errors.govHealthWorkerId && (
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                            <AlertCircle className="w-5 h-5 text-red-500" />
+                          </div>
+                        )}
+                      </div>
+                      {errors.govHealthWorkerId && (
+                        <p className="text-sm text-red-500 flex items-center mt-1">
+                          <AlertCircle className="w-4 h-4 mr-1" />
+                          {errors.govHealthWorkerId}
+                        </p>
+                      )}
+                    </div>
+                  )}                  {/* Area/Village Name - Only for Health Workers */}
+                  {userType === "health-worker" && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center">
+                        <MapPin className="w-4 h-4 mr-2 text-blue-500" />
+                        {t("signup.areaVillage")}{" "}
+                        <span className="text-red-500 ml-1">*</span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={formData.areaVillage}
+                          onChange={(e) =>
+                            handleInputChange("areaVillage", e.target.value)
+                          }
+                          placeholder={t("signup.areaVillagePlaceholder")}
+                          className="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                        />
+                        {errors.areaVillage && (
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                            <AlertCircle className="w-5 h-5 text-red-500" />
+                          </div>
+                        )}
+                      </div>
+                      {errors.areaVillage && (
+                        <p className="text-sm text-red-500 flex items-center mt-1">
+                          <AlertCircle className="w-4 h-4 mr-1" />
+                          {errors.areaVillage}
+                        </p>
+                      )}
+                    </div>
+                  )}                  {/* PHC/Sub-center Name - Only for Health Workers */}
+                  {userType === "health-worker" && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center">
+                        <Building className="w-4 h-4 mr-2 text-blue-500" />
+                        {t("signup.phcSubcenter")}{" "}
+                        <span className="text-red-500 ml-1">*</span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={formData.phcSubcenter}
+                          onChange={(e) =>
+                            handleInputChange("phcSubcenter", e.target.value)
+                          }
+                          placeholder={t("signup.phcSubcenterPlaceholder")}
+                          className="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                        />
+                        {errors.phcSubcenter && (
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                            <AlertCircle className="w-5 h-5 text-red-500" />
+                          </div>
+                        )}
+                      </div>
+                      {errors.phcSubcenter && (
+                        <p className="text-sm text-red-500 flex items-center mt-1">
+                          <AlertCircle className="w-4 h-4 mr-1" />
+                          {errors.phcSubcenter}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>                {/* Designation - Full Width - Only for Health Workers */}
+                {userType === "health-worker" && (
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center">
                       <UserCheck className="w-4 h-4 mr-2 text-blue-500" />
-                      {t("signup.govHealthWorkerId")}{" "}
+                      {t("signup.designation")}{" "}
                       <span className="text-red-500 ml-1">*</span>
                     </label>
                     <div className="relative">
-                      <input
-                        type="text"
-                        value={formData.govHealthWorkerId}
+                      <select
+                        value={formData.designation}
                         onChange={(e) =>
-                          handleInputChange("govHealthWorkerId", e.target.value)
+                          handleInputChange("designation", e.target.value)
                         }
-                        placeholder={t("signup.govHealthWorkerIdPlaceholder")}
-                        className="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                      />
-                      {errors.govHealthWorkerId && (
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                          <AlertCircle className="w-5 h-5 text-red-500" />
-                        </div>
-                      )}
-                    </div>
-                    {errors.govHealthWorkerId && (
-                      <p className="text-sm text-red-500 flex items-center mt-1">
-                        <AlertCircle className="w-4 h-4 mr-1" />
-                        {errors.govHealthWorkerId}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Area/Village Name */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center">
-                      <MapPin className="w-4 h-4 mr-2 text-blue-500" />
-                      {t("signup.areaVillage")}{" "}
-                      <span className="text-red-500 ml-1">*</span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={formData.areaVillage}
-                        onChange={(e) =>
-                          handleInputChange("areaVillage", e.target.value)
-                        }
-                        placeholder={t("signup.areaVillagePlaceholder")}
-                        className="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                      />
-                      {errors.areaVillage && (
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                          <AlertCircle className="w-5 h-5 text-red-500" />
-                        </div>
-                      )}
-                    </div>
-                    {errors.areaVillage && (
-                      <p className="text-sm text-red-500 flex items-center mt-1">
-                        <AlertCircle className="w-4 h-4 mr-1" />
-                        {errors.areaVillage}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* PHC/Sub-center Name */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center">
-                      <Building className="w-4 h-4 mr-2 text-blue-500" />
-                      {t("signup.phcSubcenter")}{" "}
-                      <span className="text-red-500 ml-1">*</span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={formData.phcSubcenter}
-                        onChange={(e) =>
-                          handleInputChange("phcSubcenter", e.target.value)
-                        }
-                        placeholder={t("signup.phcSubcenterPlaceholder")}
-                        className="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                      />
-                      {errors.phcSubcenter && (
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                          <AlertCircle className="w-5 h-5 text-red-500" />
-                        </div>
-                      )}
-                    </div>
-                    {errors.phcSubcenter && (
-                      <p className="text-sm text-red-500 flex items-center mt-1">
-                        <AlertCircle className="w-4 h-4 mr-1" />
-                        {errors.phcSubcenter}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Designation - Full Width */}
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center">
-                    <UserCheck className="w-4 h-4 mr-2 text-blue-500" />
-                    {t("signup.designation")}{" "}
-                    <span className="text-red-500 ml-1">*</span>
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={formData.designation}
-                      onChange={(e) =>
-                        handleInputChange("designation", e.target.value)
-                      }
-                      className="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none cursor-pointer"
-                    >
-                      <option value="">
-                        {t("signup.designationPlaceholder")}
-                      </option>
-                      {designationOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                      <svg
-                        className="w-5 h-5 text-slate-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                        className="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none cursor-pointer"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
+                        <option value="">
+                          {t("signup.designationPlaceholder")}
+                        </option>
+                        {designationOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <svg
+                          className="w-5 h-5 text-slate-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </div>
+                      {errors.designation && (
+                        <div className="absolute inset-y-0 right-8 flex items-center pr-3">
+                          <AlertCircle className="w-5 h-5 text-red-500" />
+                        </div>
+                      )}
                     </div>
                     {errors.designation && (
-                      <div className="absolute inset-y-0 right-8 flex items-center pr-3">
-                        <AlertCircle className="w-5 h-5 text-red-500" />
-                      </div>
+                      <p className="text-sm text-red-500 flex items-center mt-1">
+                        <AlertCircle className="w-4 h-4 mr-1" />
+                        {errors.designation}
+                      </p>
                     )}
                   </div>
-                  {errors.designation && (
-                    <p className="text-sm text-red-500 flex items-center mt-1">
-                      <AlertCircle className="w-4 h-4 mr-1" />
-                      {errors.designation}
-                    </p>
-                  )}
-                </div>
+                )}
 
                 {/* OTP Section */}
                 {otpData.isOTPSent && (
