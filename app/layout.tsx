@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/utils/theme-provider";
@@ -59,17 +59,6 @@ export const metadata: Metadata = {
     description:
       "Revolutionizing healthcare with AI-powered diagnosis, monitoring, and personalized medical care.",
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-    viewportFit: "cover",
-  },
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-  ],
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -87,6 +76,18 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -95,8 +96,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link rel="icon" href="/icons/medailogo.svg" type="image/svg+xml" />
+        <link rel="icon" href="/icons/medailogo.svg" sizes="any" />
+        <link rel="apple-touch-icon" href="/icons/medailogo.svg" />
+        <link rel="mask-icon" href="/icons/medailogo.svg" color="#3b82f6" />
         <meta name="theme-color" content="#3b82f6" />
       </head>
       <body

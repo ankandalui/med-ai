@@ -12,6 +12,7 @@ export default function Home() {
       <section className="min-h-screen flex items-center justify-center relative">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col items-center text-center space-y-8 max-w-4xl mx-auto">
+            {" "}
             {/* Main Heading with PointerHighlight */}
             <div className="space-y-4">
               <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
@@ -30,7 +31,6 @@ export default function Home() {
                 {t("homepage.subtitle")}
               </p>
             </div>
-
             {/* CTA Buttons */}
             <div className="flex gap-4 items-center flex-col sm:flex-row pt-4">
               <a

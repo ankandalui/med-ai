@@ -5,7 +5,8 @@ import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageDropdown } from "@/components/language-dropdown";
 import { useTranslation } from "react-i18next";
-import { Menu, X, Stethoscope } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import Image from "next/image";
 
 export function Navbar() {
   const { t } = useTranslation();
@@ -22,15 +23,20 @@ export function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex h-14 md:h-16 items-center justify-between">
           {/* Logo - Left */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <Stethoscope className="h-5 w-5 text-white" />
+          <Link href="/" className="flex items-center">
+            <div className="w-10 h-10 flex items-center justify-center">
+              <Image
+                src="/icons/medailogo.svg"
+                alt="MedAI Logo"
+                width={32}
+                height={32}
+                className=""
+              />
             </div>
-            <span className="font-bold text-lg md:text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="font-bold text-xl md:text-2xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               MedAI
             </span>
           </Link>
-
           {/* Desktop Navigation - Center (Hidden on mobile) */}
           <nav className="hidden md:flex items-center space-x-6">
             {navigationItems.map((item) => (
@@ -43,7 +49,6 @@ export function Navbar() {
               </Link>
             ))}
           </nav>
-
           {/* Right Side - Theme, Language, Auth */}
           <div className="flex items-center space-x-2">
             {/* Desktop Auth Buttons (Hidden on mobile) */}
