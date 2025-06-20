@@ -24,10 +24,10 @@ export function Navbar() {
   const handleInstallPWA = async () => {
     await installPWA();
   };
-
   return (
-    <div className="w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
-      <div className="container mx-auto px-4">
+    <div className="w-full border-b border-white/20 bg-white/10 backdrop-blur-xl supports-[backdrop-filter]:bg-white/5 fixed top-0 left-0 right-0 z-50 shadow-lg shadow-black/5">
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-blue-500/5"></div>
+      <div className="container mx-auto px-4 relative">
         <div className="flex h-14 md:h-16 items-center justify-between">
           {/* Logo - Left */}
           <Link href="/" className="flex items-center">
@@ -172,28 +172,31 @@ export function Navbar() {
                     transitionDelay: isMobileMenuOpen ? "500ms" : "0ms",
                   }}
                 >
+                  {" "}
                   {t("navbar.signUp")}
                 </button>{" "}
               </Link>
               {/* Mobile App Download Button - Only show if installable and not installed */}
               {isInstallable && !isInstalled && (
-                <Button
-                  className={`w-full bg-primary text-primary-foreground hover:bg-primary/90 p-3 font-medium transition-all duration-300 transform shadow-lg ${
-                    isMobileMenuOpen
-                      ? "translate-x-0 opacity-100 scale-100"
-                      : "translate-x-8 opacity-0 scale-95"
-                  }`}
-                  style={{
-                    transitionDelay: isMobileMenuOpen ? "600ms" : "0ms",
-                  }}
-                  onClick={() => {
-                    handleInstallPWA();
-                    setIsMobileMenuOpen(false);
-                  }}
-                >
-                  <Download className="w-4 h-4" />
-                  Download App
-                </Button>
+                <div className="pt-2">
+                  <Button
+                    className={`w-full bg-primary text-primary-foreground hover:bg-primary/90 p-3 font-medium transition-all duration-300 transform shadow-lg ${
+                      isMobileMenuOpen
+                        ? "translate-x-0 opacity-100 scale-100"
+                        : "translate-x-8 opacity-0 scale-95"
+                    }`}
+                    style={{
+                      transitionDelay: isMobileMenuOpen ? "600ms" : "0ms",
+                    }}
+                    onClick={() => {
+                      handleInstallPWA();
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download App
+                  </Button>
+                </div>
               )}
             </div>
           </div>

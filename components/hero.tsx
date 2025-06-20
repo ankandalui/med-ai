@@ -14,9 +14,9 @@ export function Hero() {
     >
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col items-center text-center space-y-8 max-w-4xl mx-auto">
-          {/* Main Heading with PointerHighlight */}
+          {/* Main Heading with PointerHighlight */}{" "}
           <div className="space-y-4">
-            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 The future of healthcare is
               </div>
@@ -28,11 +28,10 @@ export function Hero() {
                 </PointerHighlight>
               </div>
             </h1>
-            <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto px-4">
+            <p className="text-xl sm:text-2xl md:text-2xl text-muted-foreground max-w-3xl mx-auto px-4 font-medium">
               {t("homepage.subtitle")}
             </p>
           </div>
-
           {/* CTA Buttons */}
           <div className="flex gap-4 items-center flex-col sm:flex-row pt-4">
             <a
@@ -40,9 +39,9 @@ export function Hero() {
               href="/diagnosis"
             >
               {t("homepage.getStarted")}
-            </a>
+            </a>{" "}
             <a
-              className="w-full sm:w-auto rounded-full border border-input hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover:scale-105 flex items-center justify-center font-medium text-sm sm:text-base h-12 sm:h-14 px-8"
+              className="w-full sm:w-auto rounded-full border-2 border-primary/30 bg-background/10 backdrop-blur-sm hover:bg-primary/10 hover:border-primary transition-all duration-300 hover:scale-105 flex items-center justify-center font-medium text-sm sm:text-base h-12 sm:h-14 px-8 shadow-lg"
               href="/about"
             >
               {t("homepage.learnMore")}
