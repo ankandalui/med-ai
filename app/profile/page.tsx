@@ -1,10 +1,6 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
-
 export default function ProfilePage() {
-  const { t } = useTranslation();
-
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center space-y-4">

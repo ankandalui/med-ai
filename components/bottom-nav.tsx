@@ -4,14 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import {
-  Home,
-  Stethoscope,
-  Activity,
-  FileText,
-  Video,
-  User,
-} from "lucide-react";
+import { Home, Stethoscope, Activity, FileText, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function BottomNav() {

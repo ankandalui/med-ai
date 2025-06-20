@@ -3,13 +3,14 @@
 import React, { useEffect, useState } from "react";
 import { I18nextProvider } from "react-i18next";
 import initI18n from "@/lib/i18n";
+import { i18n } from "i18next";
 
 interface I18nProviderProps {
   children: React.ReactNode;
 }
 
 export function I18nProvider({ children }: I18nProviderProps) {
-  const [i18nInstance, setI18nInstance] = useState<any>(null);
+  const [i18nInstance, setI18nInstance] = useState<i18n | null>(null);
 
   useEffect(() => {
     const i18n = initI18n();
