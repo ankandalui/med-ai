@@ -9,7 +9,7 @@ export function Hero() {
     <section
       className="min-h-screen flex items-center justify-center relative bg-cover bg-no-repeat bg-scroll bg-[40%_center] md:bg-center"
       style={{
-        backgroundImage: "url('/images/bg.png')",
+        backgroundImage: "url('/images/bg.svg')",
       }}
     >
       <div className="container mx-auto px-4 py-8">
