@@ -59,19 +59,20 @@ export function PWAInstallToast() {
       return () => clearTimeout(timer);
     }
   }, [isInstallable, isInstalled, toastShown]);
-
   const showInstallToast = () => {
     toast.custom(
       (t) => (
-        <div className="bg-background border rounded-lg shadow-lg p-4 max-w-md w-full">
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <Smartphone className="h-4 w-4 text-white" />
+        <div className="bg-background border rounded-lg shadow-lg p-6 max-w-sm md:max-w-lg w-full animate-in slide-in-from-right duration-300">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <Smartphone className="h-5 w-5 md:h-6 md:w-6 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-sm">Install MedAI App</h3>
-                <p className="text-xs text-muted-foreground">
+                <h3 className="font-semibold text-base md:text-lg">
+                  Install MedAI App
+                </h3>
+                <p className="text-sm md:text-base text-muted-foreground">
                   Get the best experience
                 </p>
               </div>
@@ -80,26 +81,26 @@ export function PWAInstallToast() {
               onClick={() => toast.dismiss(t)}
               className="text-muted-foreground hover:text-foreground p-1"
             >
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5" />
             </button>
           </div>
 
-          <div className="space-y-2 mb-4">
-            <div className="flex items-center space-x-2 text-xs">
-              <Zap className="h-3 w-3 text-yellow-500" />
+          <div className="space-y-3 mb-6">
+            <div className="flex items-center space-x-3 text-sm md:text-base">
+              <Zap className="h-4 w-4 md:h-5 md:w-5 text-yellow-500" />
               <span>Faster access & better performance</span>
             </div>
-            <div className="flex items-center space-x-2 text-xs">
-              <Wifi className="h-3 w-3 text-green-500" />
+            <div className="flex items-center space-x-3 text-sm md:text-base">
+              <Wifi className="h-4 w-4 md:h-5 md:w-5 text-green-500" />
               <span>Works offline for emergency access</span>
             </div>
-            <div className="flex items-center space-x-2 text-xs">
-              <Shield className="h-3 w-3 text-blue-500" />
+            <div className="flex items-center space-x-3 text-sm md:text-base">
+              <Shield className="h-4 w-4 md:h-5 md:w-5 text-blue-500" />
               <span>Secure & private health data</span>
             </div>
           </div>
 
-          <div className="flex space-x-2">
+          <div className="flex space-x-3">
             <button
               onClick={async () => {
                 const installed = await installPWA();
@@ -111,14 +112,14 @@ export function PWAInstallToast() {
                 }
                 toast.dismiss(t);
               }}
-              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 px-3 py-2 rounded-md text-xs font-medium transition-colors flex items-center justify-center space-x-1"
+              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-3 rounded-md text-sm md:text-base font-medium transition-colors flex items-center justify-center space-x-2"
             >
-              <Download className="h-3 w-3" />
+              <Download className="h-4 w-4 md:h-5 md:w-5" />
               <span>Install App</span>
             </button>
             <button
               onClick={() => toast.dismiss(t)}
-              className="px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="px-4 py-3 text-sm md:text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Later
             </button>
@@ -130,7 +131,7 @@ export function PWAInstallToast() {
                 );
                 toast.dismiss(t);
               }}
-              className="px-2 py-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="px-3 py-3 text-sm md:text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Never
             </button>
@@ -139,7 +140,7 @@ export function PWAInstallToast() {
       ),
       {
         duration: 15000, // Show for 15 seconds
-        position: "bottom-center",
+        position: window.innerWidth >= 768 ? "top-right" : "bottom-center",
       }
     );
   };

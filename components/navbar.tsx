@@ -5,8 +5,9 @@ import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageDropdown } from "@/components/language-dropdown";
 import { useTranslation } from "react-i18next";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Download } from "lucide-react";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 export function Navbar() {
   const { t } = useTranslation();
@@ -48,7 +49,7 @@ export function Navbar() {
                 {item.name}
               </Link>
             ))}
-          </nav>
+          </nav>{" "}
           {/* Right Side - Theme, Language, Auth */}
           <div className="flex items-center space-x-2">
             {/* Desktop Auth Buttons (Hidden on mobile) */}
@@ -62,11 +63,17 @@ export function Navbar() {
                 <button className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md text-sm font-medium transition-colors">
                   {t("navbar.signUp")}
                 </button>
-              </Link>
+              </Link>{" "}
+              {/* App Download Button */}
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:scale-105">
+                <Download className="w-4 h-4" />
+                Download App
+              </Button>
             </div>
             {/* Theme and Language (Always visible) */}
             <ThemeToggle />
-            <LanguageDropdown /> {/* Mobile Menu Button */}
+            <LanguageDropdown />
+            {/* Mobile Menu Button */}
             <button
               className="md:hidden p-2 rounded-md hover:bg-accent transition-all duration-300"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -125,8 +132,7 @@ export function Navbar() {
                   {item.name}
                 </Link>
               ))}
-            </div>
-
+            </div>{" "}
             {/* Mobile Auth Buttons */}
             <div className="space-y-3 px-4 pt-4 border-t">
               <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
@@ -157,6 +163,21 @@ export function Navbar() {
                   {t("navbar.signUp")}
                 </button>
               </Link>
+              {/* Mobile App Download Button */}{" "}
+              <Button
+                className={`w-full bg-primary text-primary-foreground hover:bg-primary/90 p-3 font-medium transition-all duration-300 transform shadow-lg ${
+                  isMobileMenuOpen
+                    ? "translate-x-0 opacity-100 scale-100"
+                    : "translate-x-8 opacity-0 scale-95"
+                }`}
+                style={{
+                  transitionDelay: isMobileMenuOpen ? "600ms" : "0ms",
+                }}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Download className="w-4 h-4" />
+                Download App
+              </Button>
             </div>
           </div>
         </div>
