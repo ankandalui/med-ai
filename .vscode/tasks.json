@@ -8,6 +8,14 @@
       "group": "build",
       "isBackground": true,
       "problemMatcher": []
+    },
+    {
+      "label": "Start Flask API",
+      "type": "shell",
+      "command": "cd skin && python app.py",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": []
     }
   ]
 }

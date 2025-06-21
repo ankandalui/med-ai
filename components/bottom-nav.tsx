@@ -23,11 +23,11 @@ export function BottomNav() {
       requireAuth: false,
     },
     {
-      href: "/diagnosis",
+      href: "/ai",
       icon: Stethoscope,
-      label: t("features.aiDiagnosis").split(" ")[0], // Get first word
-      isActive: pathname === "/diagnosis",
-      requireAuth: true,
+      label: "AI",
+      isActive: pathname === "/ai",
+      requireAuth: false,
     },
     {
       href: "/monitoring",
