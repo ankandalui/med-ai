@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/utils/theme-provider";
 import { I18nProvider } from "@/components/i18n-provider";
 import { Navbar } from "@/components/navbar";
 import { LanguageSelector } from "@/components/language-selector";
-import { BottomNav } from "@/components/bottom-nav";
+import { NavigationWrapper } from "@/components/navigation-wrapper";
 import { PWAInstallToast } from "@/components/pwa-install-toast";
 import { PWARegister } from "@/components/pwa-register";
 import { Toaster } from "sonner";
@@ -108,10 +108,9 @@ export default function RootLayout({
         <ThemeProvider defaultTheme="system">
           <I18nProvider>
             <PWARegister />
-            <LanguageSelector />
-            <Navbar />
+            <LanguageSelector /> <Navbar />
             <main className="pb-16 lg:pb-0">{children}</main>
-            <BottomNav />
+            <NavigationWrapper />
             <PWAInstallToast />
             <Toaster richColors position="bottom-center" />
           </I18nProvider>

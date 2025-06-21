@@ -4,46 +4,56 @@ import React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { Home, Activity, FileText, User, Bell } from "lucide-react";
+import { Home, Stethoscope, Activity, FileText, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 
-export function BottomNav() {
+export function HealthWorkerBottomNav() {
   const { t } = useTranslation();
   const pathname = usePathname();
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
+
+  // Only show for health workers
+  if (!isAuthenticated || user?.userType !== "HEALTH_WORKER") {
+    return null;
+  }
+
   const navItems = [
     {
-      href: "/",
+      href: "/health-worker",
       icon: Home,
       label: "Home",
-      isActive: pathname === "/",
-      requireAuth: false,
+      isActive:
+        pathname === "/health-worker" ||
+        pathname === "/health-worker/dashboard",
+      requireAuth: true,
     },
     {
-      href: "/patient",
+      href: "/ai",
+      icon: Stethoscope,
+      label: "AI",
+      isActive:
+        pathname === "/ai" ||
+        pathname === "/symptom-prediction" ||
+        pathname === "/diagnosis" ||
+        pathname === "/disease-prediction" ||
+        pathname.startsWith("/ai/"),
+      requireAuth: true,
+    },
+    {
+      href: "/monitoring",
       icon: Activity,
-      label: "Dashboard",
-      isActive: pathname === "/patient" || pathname.startsWith("/patient/"),
+      label: "Monitor",
+      isActive:
+        pathname === "/monitoring" || pathname.startsWith("/monitoring/"),
       requireAuth: true,
     },
     {
-      href: "/patient/locker",
+      href: "/records",
       icon: FileText,
-      label: "Locker",
-      isActive:
-        pathname === "/patient/locker" ||
-        pathname.startsWith("/patient/locker"),
-      requireAuth: true,
-    },
-    {
-      href: "/patient/reminders",
-      icon: Bell,
-      label: "Reminders",
-      isActive:
-        pathname === "/patient/reminders" ||
-        pathname.startsWith("/patient/reminders"),
+      label: "Records",
+      isActive: pathname === "/records" || pathname.startsWith("/records/"),
       requireAuth: true,
     },
     {
@@ -62,6 +72,7 @@ export function BottomNav() {
     }
     router.push(item.href);
   };
+
   return (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur border-t supports-[backdrop-filter]:bg-background/80">
       <div className="grid grid-cols-5 h-16">

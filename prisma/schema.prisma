@@ -51,6 +51,18 @@ model Patient {
   // Medical records
   records      MedicalRecord[]
   
+  // Uploaded documents
+  uploadedDocuments UploadedDocument[]
+  
+  // Emergency information
+  emergencyInfo EmergencyInfo?
+  
+  // Health reminders
+  healthReminders HealthReminder[]
+  
+  // Patient monitoring (one-to-one)
+  monitoring        PatientMonitoring?
+  
   @@map("patients")
 }
 
@@ -93,6 +105,32 @@ model MedicalRecord {
   @@map("medical_records")
 }
 
+model UploadedDocument {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  patientId   String   @db.ObjectId
+  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+  // File information
+  title       String
+  description String?
+  fileName    String
+  fileSize    Int
+  fileType    String
+  
+  // Document type
+  type        String   // prescription, report, vaccine, scan, other
+  tags        String[]
+  
+  // Lighthouse IPFS data
+  cid         String   @unique
+  ipfsUrl     String
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("uploaded_documents")
+}
+
 model OTPVerification {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String?
@@ -103,4 +141,127 @@ model OTPVerification {
   createdAt DateTime @default(now())
   
   @@map("otp_verifications")
+}
+
+model EmergencyInfo {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  patientId        String   @unique @db.ObjectId
+  patient          Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+  // Medical information
+  bloodType        String?
+  allergies        String[]
+  medications      String[]
+  conditions       String[]
+  
+  // Emergency contacts (stored as JSON array)
+  emergencyContacts Json[]
+  
+  // Medical providers
+  doctorName       String?
+  doctorPhone      String?
+  hospital         String?
+  insuranceInfo    String?
+  
+  // Preferences
+  organDonor       Boolean  @default(false)
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  @@map("emergency_info")
+}
+
+model HealthReminder {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  patientId   String   @db.ObjectId
+  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+  // Reminder details
+  type        String   // medication, appointment, checkup, vaccination, exercise, other
+  title       String
+  description String?
+  
+  // Scheduling
+  date        String
+  time        String
+  frequency   String   // once, daily, weekly, monthly, yearly
+  
+  // Status
+  status      String   @default("active") // active, completed, missed, snoozed
+  priority    String   @default("medium") // high, medium, low
+  
+  // Tracking
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastNotified  DateTime?
+  
+  @@map("health_reminders")
+}
+
+model PatientMonitoring {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  patientId          String   @unique @db.ObjectId
+  patient            Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+  // Vitals monitoring
+  heartRate          Int      @default(0)
+  bloodPressure      String   @default("0/0")
+  temperature        Float    @default(0.0)
+  weight             Float    @default(0.0)
+  
+  // Patient info from emergency
+  symptoms           String?
+  diagnosis          String?
+  emergencyId        String?
+  healthWorkerPhone  String?
+  location          String?
+  age               Int?
+  
+  // Status tracking
+  status            String   @default("stable") // stable, attention, critical
+  
+  // Associated alerts
+  alerts            PatientAlert[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("patient_monitoring")
+}
+
+model PatientAlert {
+  id                   String           @id @default(auto()) @map("_id") @db.ObjectId
+  patientMonitoringId  String           @db.ObjectId
+  patientMonitoring    PatientMonitoring @relation(fields: [patientMonitoringId], references: [id], onDelete: Cascade)
+  
+  type                 String   // CRITICAL, WARNING, INFO
+  message              String
+  isRead               Boolean  @default(false)
+  
+  createdAt            DateTime @default(now())
+  
+  @@map("patient_alerts")
+}
+
+model EmergencyAlert {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  emergencyId       String   @unique
+  
+  // Patient information
+  patientName       String
+  patientPhone      String
+  symptoms          String
+  diagnosis         String
+  
+  // Contact information
+  healthWorkerPhone String
+  hospitalPhone     String
+  ambulancePhone    String
+  
+  // Status tracking
+  status            String   @default("PENDING") // PENDING, SENT, CONFIRMED, COMPLETED
+  sentAt            DateTime @default(now())
+  
+  @@map("emergency_alerts")
 }

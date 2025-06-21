@@ -37,12 +37,40 @@ export function Navbar() {
   const handleInstallPWA = async () => {
     await installPWA();
   };
+  // Dynamic navigation based on user role
+  const getNavigationItems = () => {
+    if (!isAuthenticated) {
+      return [
+        { name: t("navbar.features"), href: "/features" },
+        { name: t("navbar.about"), href: "/about" },
+        { name: t("navbar.contact"), href: "/contact" },
+      ];
+    }
+    if (user?.userType === "HEALTH_WORKER") {
+      return [
+        { name: "Dashboard", href: "/health-worker/dashboard" },
+        { name: "AI Analysis", href: "/ai" },
+        { name: "Disease Prediction", href: "/disease-prediction" },
+        { name: "Symptom Analysis", href: "/symptom-prediction" },
+        { name: "Diagnosis", href: "/diagnosis" },
+        { name: "Patients", href: "/health-worker/patients" },
+        { name: "Reports", href: "/health-worker/reports" },
+      ];
+    }
 
-  const navigationItems = [
-    { name: t("navbar.features"), href: "/features" },
-    { name: t("navbar.about"), href: "/about" },
-    { name: t("navbar.contact"), href: "/contact" },
-  ];
+    if (user?.userType === "PATIENT") {
+      return [
+        { name: "Dashboard", href: "/patient" },
+        { name: "Medical Records", href: "/patient/locker" },
+        { name: "Reminders", href: "/patient/reminders" },
+        { name: "Emergency", href: "/patient/emergency" },
+      ];
+    }
+
+    return [];
+  };
+
+  const navigationItems = getNavigationItems();
   return (
     <div className="w-full border-b border-border bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80 fixed top-0 left-0 right-0 z-50 shadow-lg">
       <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5"></div>
@@ -109,15 +137,30 @@ export function Navbar() {
                     {/* Dropdown Menu */}
                     {isUserMenuOpen && (
                       <div className="absolute right-0 mt-2 w-48 bg-card border rounded-lg shadow-lg z-50">
+                        {" "}
                         <div className="py-1">
                           <Link
-                            href="/profile"
+                            href={
+                              user?.userType === "HEALTH_WORKER"
+                                ? "/health-worker/profile"
+                                : "/patient/profile"
+                            }
                             onClick={() => setIsUserMenuOpen(false)}
                             className="flex items-center px-4 py-2 text-sm hover:bg-accent transition-colors"
                           >
                             <User className="w-4 h-4 mr-2" />
                             Profile
                           </Link>
+                          {user?.userType === "HEALTH_WORKER" && (
+                            <Link
+                              href="/health-worker/settings"
+                              onClick={() => setIsUserMenuOpen(false)}
+                              className="flex items-center px-4 py-2 text-sm hover:bg-accent transition-colors"
+                            >
+                              <Settings className="w-4 h-4 mr-2" />
+                              Settings
+                            </Link>
+                          )}
                           <button
                             onClick={handleLogout}
                             className="flex items-center w-full px-4 py-2 text-sm hover:bg-accent transition-colors text-left"
@@ -224,6 +267,7 @@ export function Navbar() {
             <div className="space-y-3 px-4 pt-4 border-t">
               {isAuthenticated ? (
                 /* Mobile User Menu */ <div className="space-y-2">
+                  {" "}
                   <div className="flex items-center space-x-3 p-3 bg-accent rounded-md border-l-4 border-green-500">
                     <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
                       {user?.name ? (
@@ -237,12 +281,18 @@ export function Navbar() {
                         {user?.name || "User"}
                       </span>
                       <span className="text-xs text-muted-foreground">
-                        Logged in
+                        {user?.userType === "HEALTH_WORKER"
+                          ? "Health Worker"
+                          : "Patient"}
                       </span>
                     </div>
                   </div>
                   <Link
-                    href="/profile"
+                    href={
+                      user?.userType === "HEALTH_WORKER"
+                        ? "/health-worker/profile"
+                        : "/patient/profile"
+                    }
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <button className="w-full flex items-center text-left p-3 text-sm font-medium hover:bg-accent rounded-md transition-colors">

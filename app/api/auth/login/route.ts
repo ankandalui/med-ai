@@ -7,23 +7,30 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email, phone } = body;
 
-    if (!email && !phone) {
+    console.log("Login attempt with:", { email, phone });
+
+    if (!phone) {
       return NextResponse.json(
-        { error: "Email or phone is required" },
+        { error: "Phone number is required" },
         { status: 400 }
       );
     }
 
-    // Find user by email or phone
+    // Find user by phone number (primary) or email (secondary)
     const user = await prisma.user.findFirst({
       where: {
-        OR: [...(email ? [{ email }] : []), ...(phone ? [{ phone }] : [])],
+        OR: [{ phone: phone }, ...(email ? [{ email: email }] : [])],
       },
       include: {
         patient: true,
         healthWorker: true,
       },
     });
+
+    console.log(
+      "User found:",
+      user ? { id: user.id, phone: user.phone, email: user.email } : null
+    );
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
