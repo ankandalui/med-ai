@@ -4,7 +4,22 @@ const SYMPTOM_API_URL = process.env.SYMPTOM_API_URL || "http://127.0.0.1:5001";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    // Get the raw text first to debug JSON parsing issues
+    const rawBody = await request.text();
+    console.log("Raw request body:", rawBody);
+
+    let body;
+    try {
+      body = JSON.parse(rawBody);
+    } catch (parseError) {
+      console.error("JSON parsing error:", parseError);
+      console.error("Raw body that failed to parse:", rawBody);
+      return NextResponse.json(
+        { error: "Invalid JSON in request body", success: false },
+        { status: 400 }
+      );
+    }
+
     const { symptoms, language = "en" } = body;
 
     if (!symptoms || symptoms.trim() === "") {

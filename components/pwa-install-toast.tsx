@@ -15,8 +15,17 @@ const TOAST_STORAGE_KEYS = {
 export function PWAInstallToast() {
   const { isInstallable, isInstalled, installPWA } = usePWAInstall();
   const [toastShown, setToastShown] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Ensure component is mounted on client-side
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
+    // Only run on client-side after mount
+    if (!isMounted) return;
+
     // If app is installed, mark it in localStorage and never show again
     if (isInstalled) {
       localStorage.setItem(TOAST_STORAGE_KEYS.APP_INSTALLED, "true");
@@ -54,11 +63,9 @@ export function PWAInstallToast() {
         showInstallToast();
         setToastShown(true);
         localStorage.setItem(TOAST_STORAGE_KEYS.LAST_SHOWN, now.toString());
-      }, 3000); // Show after 3 seconds
-
-      return () => clearTimeout(timer);
+      }, 3000); // Show after 3 seconds      return () => clearTimeout(timer);
     }
-  }, [isInstallable, isInstalled, toastShown]);
+  }, [isInstallable, isInstalled, toastShown, isMounted]);
   const showInstallToast = () => {
     toast.custom(
       (t) => (

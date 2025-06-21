@@ -39,6 +39,14 @@ interface DiagnosisSection {
   content: string;
 }
 
+// Client-side only emergency ID generator to prevent hydration mismatches
+const generateEmergencyId = () => {
+  if (typeof window === "undefined") {
+    return "EMG-LOADING"; // Placeholder for SSR
+  }
+  return "EMG-" + Math.random().toString(36).substr(2, 9).toUpperCase();
+};
+
 export default function SymptomPredictionPage() {
   const { t } = useTranslation();
   const [symptoms, setSymptoms] = useState("");
@@ -257,7 +265,8 @@ export default function SymptomPredictionPage() {
     } finally {
       setIsAnalyzing(false);
     }
-  };  const handleSOSAlert = async () => {
+  };
+  const handleSOSAlert = async () => {
     setIsSOSSending(true);
     setSOSStatus("Sending SOS Alert...");
 
@@ -267,14 +276,14 @@ export default function SymptomPredictionPage() {
     // Multiple console methods for maximum visibility
     console.log("\n\n" + "🚨".repeat(30));
     console.warn("🚨🚨🚨 EMERGENCY SOS ALERT SYSTEM ACTIVATED 🚨🚨🚨");
-    console.error("🆘 CRITICAL EMERGENCY - SENDING SOS ALERT 🆘");
+    console.warn("🆘 CRITICAL EMERGENCY - SENDING SOS ALERT 🆘");
     console.log("🚨".repeat(30) + "\n");
 
     // Force console output with different methods
     console.group("🚨 EMERGENCY SOS DETAILS:");
     console.log("📱 Emergency Call Initiated");
     console.warn("📞 From Health Worker: 7074757878");
-    console.error("🏥 Alerting Government Hospital: 8100752679");
+    console.warn("🏥 Alerting Government Hospital: 8100752679");
     console.warn("🚑 Dispatching Ambulance Service: 8653015622");
     console.log("📍 Patient Location: Critical Emergency Detected");
     console.warn(
@@ -283,82 +292,159 @@ export default function SymptomPredictionPage() {
           "Critical symptoms detected")
     );
     console.log("⏰ Emergency Timestamp: " + new Date().toISOString());
-    console.error(
-      "🆔 Emergency ID: EMG-" +
-        Math.random().toString(36).substr(2, 9).toUpperCase()
-    );
+    console.warn("🆔 Emergency ID: " + generateEmergencyId());
     console.groupEnd();
 
     try {
-      // Store emergency data for health worker monitoring
+      console.log("💾 POSTING EMERGENCY DATA TO DATABASE...");
+
+      // Prepare emergency data for database storage
       const emergencyData = {
-        emergencyId: "EMG-" + Math.random().toString(36).substr(2, 9).toUpperCase(),
+        emergencyId: generateEmergencyId(),
+        patientName: "Emergency Patient", // TODO: Get from user input
+        patientPhone: "9999999999", // TODO: Get from user input
         symptoms: symptoms,
         diagnosis: prediction?.diagnosis || "Critical symptoms detected",
-        language: selectedLanguage,
-        timestamp: new Date().toISOString(),
-        status: "critical",
         healthWorkerPhone: "7074757878",
-        hospitalPhone: "8100752679",
-        ambulancePhone: "8653015622"
+        location: "Unknown Location", // TODO: Get from user input
+        age: null, // TODO: Get from user input
+        status: "CRITICAL",
       };
 
-      // Store in localStorage for health worker access
-      localStorage.setItem("emergencyData", JSON.stringify(emergencyData));
+      console.log("🚨 POSTING EMERGENCY TO DATABASE:");
+      console.log("📋 Emergency data:", JSON.stringify(emergencyData, null, 2));
+
+      // POST emergency data to database instead of localStorage
+      setSOSStatus("Creating emergency alert...");
+      const emergencyResponse = await fetch("/api/emergency", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(emergencyData),
+      });
+
+      const emergencyResult = await emergencyResponse.json();
+      console.log("🏥 DATABASE EMERGENCY CREATION:", emergencyResult);
+
+      if (!emergencyResult.success) {
+        throw new Error(`Failed to create emergency: ${emergencyResult.error}`);
+      }
+      console.log("✅ EMERGENCY STORED IN DATABASE");
+      console.log("📋 Emergency ID:", emergencyResult.data.emergencyId);
+      console.log("📋 Alert ID:", emergencyResult.data.alertId);
+
+      // AUTOMATICALLY ADD PATIENT TO HEALTH WORKER MONITORING SYSTEM
+      console.log("\n🩺 ADDING PATIENT TO HEALTH WORKER MONITORING...");
+      setSOSStatus("Adding patient to monitoring system...");
+
+      const monitoringData = {
+        patientName: emergencyData.patientName,
+        patientPhone: emergencyData.patientPhone,
+        patientAge: emergencyData.age,
+        patientLocation: emergencyData.location,
+        symptoms: emergencyData.symptoms,
+        diagnosis: emergencyData.diagnosis,
+        status: "critical", // Always critical for AI-detected emergencies
+        emergencyId: emergencyData.emergencyId,
+        healthWorkerPhone: emergencyData.healthWorkerPhone,
+      };
+
+      console.log(
+        "📋 Monitoring data:",
+        JSON.stringify(monitoringData, null, 2)
+      );
+
+      const monitoringResponse = await fetch("/api/health-worker/monitoring", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(monitoringData),
+      });
+
+      const monitoringResult = await monitoringResponse.json();
+      console.log("🔍 HEALTH WORKER MONITORING CREATION:", monitoringResult);
+
+      if (monitoringResult.success) {
+        console.log("✅ PATIENT ADDED TO MONITORING SYSTEM");
+        console.log("📋 Monitoring ID:", monitoringResult.data?.id);
+        if (monitoringResult.authoritiesNotified) {
+          console.log("🚨 AUTHORITIES AUTOMATICALLY NOTIFIED");
+          console.log(
+            "📞 Emergency contacts:",
+            monitoringResult.emergencyContacts
+          );
+        }
+      } else {
+        console.warn("⚠️ Failed to add to monitoring:", monitoringResult.error);
+      }
+
+      console.log("📱 Health Worker Phone:", emergencyData.healthWorkerPhone);
+      console.log("🏥 Hospital Phone: 8100752679");
+      console.log("🚑 Ambulance Phone: 8653015622");
 
       // Simulate sending SOS to hospital with MAXIMUM VISIBILITY
       console.log("\n🏥 CONTACTING HOSPITAL...");
       await new Promise((resolve) => setTimeout(resolve, 1000));
+      setSOSStatus("Hospital notified: 8100752679");
 
       console.clear();
       console.warn("✅ HOSPITAL NOTIFICATION SUCCESSFUL");
-      console.error("   📞 SOS going from Health Worker 7074757878 to 8100752679 hospital");
+      console.warn(
+        "   📞 SOS going from Health Worker 7074757878 to 8100752679 hospital"
+      );
       console.log("   📋 Status: Emergency department alerted");
       console.warn("   🏥 Facility: Government District Hospital");
-      console.error("   🚨 PRIORITY: CRITICAL - Code Red");
-      setSOSStatus("Hospital notified: 8100752679");
+      console.warn("   🚨 PRIORITY: CRITICAL - Code Red");
 
       console.log("\n🚑 CONTACTING AMBULANCE...");
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      console.warn("✅ AMBULANCE DISPATCH SUCCESSFUL");
-      console.error("   📞 SOS going from Health Worker 7074757878 to 8653015622 ambulance");
-      console.log("   🚑 Status: Emergency vehicle dispatched");
-      console.warn("   ⏱️  ETA: 8-12 minutes");
-      console.error("   🚨 AMBULANCE EN ROUTE - CRITICAL PATIENT");
       setSOSStatus("Ambulance dispatched: 8653015622");
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.warn("✅ AMBULANCE DISPATCH SUCCESSFUL");
+      console.log(
+        "   📞 SOS going from Health Worker 7074757878 to 8653015622 ambulance"
+      );
+      console.log("   🚑 Status: Emergency vehicle dispatched");
+      console.warn("   ⏱️  ETA: 8-12 minutes");
+      console.log("   🚨 AMBULANCE EN ROUTE - CRITICAL PATIENT");
 
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       console.clear();
-      console.error("✅ ALL EMERGENCY SERVICES NOTIFIED");
+      console.log("✅ ALL EMERGENCY SERVICES NOTIFIED");
       console.warn("   🚨 Priority: CRITICAL - Code Red");
       console.log("   📡 GPS Location: Transmitted to emergency services");
-      console.error("   📝 Medical Info: Patient emergency card shared");
+      console.log("   📝 Medical Info: Patient emergency card shared");
       console.warn("   🏥 Hospital: 8100752679 - ALERTED");
-      console.error("   🚑 Ambulance: 8653015622 - DISPATCHED");
+      console.log("   🚑 Ambulance: 8653015622 - DISPATCHED");
       setSOSStatus("Emergency services en route!");
 
-      // Final summary with all console methods
       console.log("\n" + "🆘".repeat(30));
       console.warn("🆘 SOS ALERT SYSTEM COMPLETE - HELP IS ON THE WAY! 🆘");
-      console.error("📞 EMERGENCY CALLS MADE:");
+      console.log("📞 EMERGENCY CALLS MADE:");
       console.warn("   From Health Worker: 7074757878 → Hospital: 8100752679");
-      console.error("   From Health Worker: 7074757878 → Ambulance: 8653015622");
+      console.log("   From Health Worker: 7074757878 → Ambulance: 8653015622");
       console.log("🆘".repeat(30) + "\n\n");
 
-      // Navigate health worker to monitoring page with critical pre-selected
+      // Navigate health worker to monitoring page with emergency ID
       setTimeout(() => {
-        window.location.href = "/monitoring?emergency=critical&auto_add=true";
+        console.log("🔄 REDIRECTING TO MONITORING PAGE...");
+        const redirectUrl = `/health-worker/monitoring?emergency=${emergencyResult.data.emergencyId}&auto_add=true`;
+        console.log("🌐 Redirect URL:", redirectUrl);
+
+        window.location.href = redirectUrl;
       }, 3000);
 
       // Alert to make sure user sees it
-      alert("🚨 SOS SENT! Redirecting health worker to monitoring dashboard...");
+      alert(
+        "🚨 SOS SENT! Emergency stored in database. Redirecting health worker to monitoring dashboard..."
+      );
     } catch (error) {
       console.clear();
-      console.error("❌ EMERGENCY SOS FAILED:", error);
+      console.log("❌ EMERGENCY SOS FAILED:", error);
       console.warn("🚨 FALLBACK: Please call emergency services directly!");
-      console.error("📞 Emergency Hotline: 108");
+      console.log("📞 Emergency Hotline: 108");
       console.log("🚨 CRITICAL ERROR - MANUAL INTERVENTION REQUIRED 🚨");
       setSOSStatus(
         "Failed to send SOS. Please call emergency services directly."

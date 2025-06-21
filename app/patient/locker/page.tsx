@@ -38,6 +38,19 @@ interface MedicalRecord {
   uploadedBy: string;
   tags: string[];
   isShared: boolean;
+  healthWorkerInfo?: {
+    name: string;
+    phone: string;
+    specialization: string;
+    hospital?: string;
+  };
+  medicalData?: {
+    diagnosis: string;
+    symptoms: string[];
+    treatment: string;
+    medications: string[];
+    notes?: string;
+  };
 }
 
 export default function PrescriptionLockerPage() {
@@ -54,45 +67,105 @@ export default function PrescriptionLockerPage() {
   useEffect(() => {
     const fetchRecords = async () => {
       try {
+        setLoading(true);
         console.log("Fetching medical records from API...");
-        const response = await fetch("/api/patient/documents");
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        // First try to get user's phone number from auth
+        if (!user?.phone) {
+          console.log("No phone number found in user auth");
+          setLoading(false);
+          return;
         }
-        const data = await response.json();
-        console.log("Fetched medical records:", data);
-        if (data.success && data.data) {
-          console.log("Processing documents:", data.data.length);
-          console.log("First document data:", data.data[0]);
 
-          // Transform the data to match the expected format
-          const transformedRecords = data.data.map((doc: any) => ({
-            id: doc.id || "",
-            type: doc.type || "other",
-            title: doc.title || "Untitled Document",
-            description: doc.description || "",
-            date: doc.date || new Date().toLocaleDateString(),
-            size: doc.size || "0 KB",
-            encrypted: doc.encrypted || false,
-            ipfsHash: doc.ipfsHash || doc.lighthouse_cid || "",
-            lighthouse_cid: doc.lighthouse_cid || doc.ipfsHash || "",
-            uploadedBy: doc.uploadedBy || "You",
-            tags: doc.tags || [],
-            isShared: doc.isShared || false,
-          }));
+        console.log("🔍 Fetching patient records for phone:", user.phone);
 
-          console.log("Transformed records:", transformedRecords);
-          setRecords(transformedRecords);
+        // Use the same API as patient dashboard that includes medical records from health workers
+        const response = await fetch(
+          `/api/patient/records?phone=${user.phone}`
+        );
+        const result = await response.json();
+
+        console.log("📋 Patient API Response:", result);
+
+        if (result.success && result.data) {
+          console.log(
+            "Processing medical records:",
+            result.data.medicalRecords?.length || 0
+          );
+          console.log(
+            "Processing uploaded documents:",
+            result.data.uploadedDocuments?.length || 0
+          ); // Transform medical records assigned by health workers into document format
+          const medicalRecordDocs = (result.data.medicalRecords || []).map(
+            (record: any) => ({
+              id: record.id,
+              type: "report" as const,
+              title: `Medical Report - ${record.diagnosis}`,
+              description: `Symptoms: ${
+                record.symptoms?.join(", ") || "N/A"
+              }\nTreatment: ${record.treatment}\nBy: ${
+                record.healthWorker?.user?.name || "Health Worker"
+              }`,
+              date: new Date(record.createdAt).toLocaleDateString(),
+              size: "Medical Record",
+              encrypted: record.encrypted || true, // Health worker records are encrypted by default
+              ipfsHash: record.cid || "",
+              lighthouse_cid: record.cid || "",
+              uploadedBy: record.healthWorker?.user?.name || "Health Worker",
+              tags: ["medical-record", "health-worker", "blockchain-verified"],
+              isShared: true,
+              healthWorkerInfo: {
+                name: record.healthWorker?.user?.name,
+                phone: record.healthWorker?.user?.phone,
+                specialization: record.healthWorker?.specialization,
+                hospital: record.healthWorker?.hospital,
+              },
+              medicalData: {
+                diagnosis: record.diagnosis,
+                symptoms: record.symptoms,
+                treatment: record.treatment,
+                medications: record.medications,
+                notes: record.notes,
+              },
+            })
+          );
+
+          // Transform uploaded documents
+          const uploadedDocs = (result.data.uploadedDocuments || []).map(
+            (doc: any) => ({
+              id: doc.id,
+              type: doc.type || "other",
+              title: doc.title || "Untitled Document",
+              description: doc.description || "",
+              date: new Date(doc.createdAt).toLocaleDateString(),
+              size: doc.size || "0 KB",
+              encrypted: doc.encrypted || false,
+              ipfsHash: doc.ipfsHash || doc.lighthouse_cid || "",
+              lighthouse_cid: doc.lighthouse_cid || doc.ipfsHash || "",
+              uploadedBy: "You",
+              tags: doc.tags || [],
+              isShared: doc.isShared || false,
+            })
+          );
+
+          // Combine both types of records
+          const allRecords = [...medicalRecordDocs, ...uploadedDocs];
+          console.log("Total records:", allRecords.length);
+          console.log(
+            "Medical records from health workers:",
+            medicalRecordDocs.length
+          );
+          console.log("Uploaded documents:", uploadedDocs.length);
+
+          setRecords(allRecords);
         } else {
-          console.log("No documents found or API error:", data);
+          console.log("No records found or API error:", result);
           setRecords([]);
         }
-
-        setLoading(false);
       } catch (error) {
         console.error("Failed to fetch medical records:", error);
         setRecords([]);
+      } finally {
         setLoading(false);
       }
     };

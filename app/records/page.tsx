@@ -25,14 +25,44 @@ interface PatientRecord {
   id: string;
   patientName: string;
   patientId: string;
-  recordType: "prescription" | "lab_report" | "scan" | "consultation" | "other";
+  patientPhone?: string;
+  recordType:
+    | "medical_record"
+    | "monitoring"
+    | "emergency"
+    | "prescription"
+    | "lab_report"
+    | "scan"
+    | "consultation"
+    | "other";
   title: string;
   description: string;
+  diagnosis?: string;
+  symptoms?: string;
+  treatment?: string;
+  medications?: string[];
+  notes?: string;
+  location?: string;
+  age?: number;
+  emergencyId?: string;
+  status: string;
+  heartRate?: number;
+  bloodPressure?: string;
+  temperature?: number;
+  weight?: number;
   date: string;
   lastAccessed: string;
-  fileSize: string;
-  isEncrypted: boolean;
-  status: "active" | "archived" | "pending";
+  healthWorker?: string;
+  healthWorkerPhone?: string;
+  hospitalPhone?: string;
+  ambulancePhone?: string;
+  alerts?: Array<{
+    id: string;
+    type: string;
+    message: string;
+    createdAt: string;
+    isRead: boolean;
+  }>;
 }
 
 export default function RecordsPage() {
@@ -42,21 +72,26 @@ export default function RecordsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
-
   // Fetch real data from APIs
   useEffect(() => {
     const fetchPatientRecords = async () => {
       try {
-        // TODO: Replace with actual API calls
-        // const response = await fetch('/api/health-worker/patient-records');
-        // const data = await response.json();
-        // setRecords(data);
+        setLoading(true);
+        const response = await fetch(
+          `/api/health-worker/records?type=${selectedFilter}&search=${searchQuery}`
+        );
+        const data = await response.json();
 
-        // Empty state until API is connected
-        setRecords([]);
-        setLoading(false);
+        if (data.success) {
+          setRecords(data.data || []);
+        } else {
+          console.error("Failed to fetch records:", data.error);
+          setRecords([]);
+        }
       } catch (error) {
         console.error("Failed to fetch patient records:", error);
+        setRecords([]);
+      } finally {
         setLoading(false);
       }
     };
@@ -64,16 +99,33 @@ export default function RecordsPage() {
     if (isAuthenticated) {
       fetchPatientRecords();
     }
-  }, [isAuthenticated]);
-
+  }, [isAuthenticated, selectedFilter, searchQuery]);
   const recordTypes = [
+    {
+      value: "medical_record",
+      label: "Medical Records",
+      icon: Stethoscope,
+      color: "blue",
+    },
+    {
+      value: "monitoring",
+      label: "Patient Monitoring",
+      icon: Heart,
+      color: "red",
+    },
+    {
+      value: "emergency",
+      label: "Emergency Alerts",
+      icon: FileText,
+      color: "orange",
+    },
     {
       value: "prescription",
       label: "Prescriptions",
       icon: Pill,
-      color: "blue",
+      color: "green",
     },
-    { value: "lab_report", label: "Lab Reports", icon: Heart, color: "green" },
+    { value: "lab_report", label: "Lab Reports", icon: Eye, color: "purple" },
     { value: "scan", label: "Medical Scans", icon: Eye, color: "purple" },
     {
       value: "consultation",
@@ -86,10 +138,10 @@ export default function RecordsPage() {
 
   const filterOptions = [
     { value: "all", label: "All Records" },
+    { value: "medical_record", label: "Medical Records" },
+    { value: "monitoring", label: "Patient Monitoring" },
+    { value: "emergency", label: "Emergency Alerts" },
     { value: "prescription", label: "Prescriptions" },
-    { value: "lab_report", label: "Lab Reports" },
-    { value: "scan", label: "Scans" },
-    { value: "consultation", label: "Consultations" },
     { value: "recent", label: "Recent" },
   ];
 
@@ -197,7 +249,164 @@ export default function RecordsPage() {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Records will be displayed here when API is connected */}
+            {records.map((record) => (
+              <div
+                key={record.id}
+                className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`p-2 rounded-lg ${
+                        record.recordType === "medical_record"
+                          ? "bg-blue-100 dark:bg-blue-900/30"
+                          : record.recordType === "monitoring"
+                          ? "bg-red-100 dark:bg-red-900/30"
+                          : record.recordType === "emergency"
+                          ? "bg-orange-100 dark:bg-orange-900/30"
+                          : "bg-gray-100 dark:bg-gray-900/30"
+                      }`}
+                    >
+                      {record.recordType === "medical_record" ? (
+                        <Stethoscope className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      ) : record.recordType === "monitoring" ? (
+                        <Heart className="w-5 h-5 text-red-600 dark:text-red-400" />
+                      ) : record.recordType === "emergency" ? (
+                        <FileText className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                      ) : (
+                        <FileText className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+                        {record.title}
+                      </h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                        {record.recordType.replace("_", " ")}
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      record.status === "critical"
+                        ? "bg-red-100 text-red-800"
+                        : record.status === "attention"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : record.status === "stable" ||
+                          record.status === "active"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {record.status}
+                  </span>
+                </div>
+
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2">
+                    <User className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                      {record.patientName}
+                    </span>
+                  </div>
+
+                  {record.patientPhone && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">
+                        📱 {record.patientPhone}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-gray-400" />
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {new Date(record.date).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  {record.location && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">
+                        📍 {record.location}
+                      </span>
+                    </div>
+                  )}
+
+                  {record.emergencyId && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono bg-red-100 text-red-800 px-2 py-1 rounded">
+                        🚨 {record.emergencyId}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  <p className="line-clamp-2">{record.description}</p>
+                  {record.diagnosis && (
+                    <p className="mt-1 text-xs">
+                      <strong>Diagnosis:</strong>{" "}
+                      {record.diagnosis.substring(0, 100)}...
+                    </p>
+                  )}
+                </div>
+
+                {record.recordType === "monitoring" && (
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-4">
+                    <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Vitals
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>❤️ {record.heartRate || 0} bpm</div>
+                      <div>🌡️ {record.temperature || 0}°C</div>
+                      <div>🩸 {record.bloodPressure || "0/0"}</div>
+                      <div>⚖️ {record.weight || 0} kg</div>
+                    </div>
+                  </div>
+                )}
+
+                {record.healthWorkerPhone && (
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                    👨‍⚕️ Health Worker: {record.healthWorkerPhone}
+                  </div>
+                )}
+
+                {record.alerts && record.alerts.length > 0 && (
+                  <div className="mb-3">
+                    <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                      Recent Alerts
+                    </h4>
+                    <div className="space-y-1">
+                      {record.alerts.slice(0, 2).map((alert) => (
+                        <div
+                          key={alert.id}
+                          className={`text-xs p-2 rounded ${
+                            alert.type === "CRITICAL"
+                              ? "bg-red-50 text-red-700"
+                              : alert.type === "WARNING"
+                              ? "bg-yellow-50 text-yellow-700"
+                              : "bg-blue-50 text-blue-700"
+                          }`}
+                        >
+                          {alert.message}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" className="flex-1">
+                    <Eye className="w-4 h-4 mr-1" />
+                    View
+                  </Button>
+                  <Button size="sm" variant="outline">
+                    <Download className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -235,10 +444,10 @@ export default function RecordsPage() {
                         : "text-gray-600 dark:text-gray-400"
                     }`}
                   />
-                </div>
+                </div>{" "}
                 <div>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    0
+                    {records.filter((r) => r.recordType === type.value).length}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {type.label}

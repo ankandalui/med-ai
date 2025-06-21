@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { AuthGuard } from "@/components/auth-guard";
+import { useAuth } from "@/hooks/use-auth";
+import { LogOut, Settings, Edit, Save, X } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -40,6 +42,14 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<any>({});
   const router = useRouter();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    if (confirm("Are you sure you want to logout?")) {
+      logout();
+      router.push("/");
+    }
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -156,6 +166,7 @@ export default function ProfilePage() {
             {/* Profile Card */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
               <div className="flex items-center justify-between mb-6">
+                {" "}
                 <div className="flex items-center space-x-4">
                   <div className="w-16 h-16 bg-gradient-to-r from-orange-600 to-red-600 rounded-full flex items-center justify-center">
                     <span className="text-2xl font-bold text-white">
@@ -169,19 +180,12 @@ export default function ProfilePage() {
                     </p>
                   </div>
                 </div>
-                {!isEditing && (
-                  <Button onClick={handleEdit} variant="outline">
-                    Edit Profile
-                  </Button>
-                )}
               </div>
-
               {error && (
                 <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-md">
                   <p className="text-red-700 dark:text-red-300">{error}</p>
                 </div>
               )}
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Basic Information */}
                 <div className="space-y-4">
@@ -407,17 +411,48 @@ export default function ProfilePage() {
                       </>
                     )}
                 </div>
-              </div>
-
+              </div>{" "}
               {/* Action Buttons */}
-              {isEditing && (
-                <div className="flex justify-end space-x-3 mt-6 pt-6 border-t">
-                  <Button onClick={handleCancel} variant="outline">
-                    Cancel
-                  </Button>
-                  <Button onClick={handleSave}>Save Changes</Button>
-                </div>
-              )}
+              <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mt-6 pt-6 border-t">
+                {isEditing ? (
+                  <div className="flex justify-end space-x-3 w-full">
+                    <Button
+                      onClick={handleCancel}
+                      variant="outline"
+                      className="flex-1 sm:flex-none"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleSave}
+                      className="flex-1 sm:flex-none"
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Changes
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <Button
+                      onClick={() => setIsEditing(true)}
+                      variant="outline"
+                      className="flex-1 sm:flex-none"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit Profile
+                    </Button>
+                    <Button
+                      onClick={handleLogout}
+                      variant="outline"
+                      className="flex-1 sm:flex-none text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-200 dark:border-red-800"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Logout
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>{" "}
           </div>
         </div>

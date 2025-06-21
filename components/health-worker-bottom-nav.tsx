@@ -42,18 +42,21 @@ export function HealthWorkerBottomNav() {
       requireAuth: true,
     },
     {
-      href: "/monitoring",
+      href: "/health-worker/monitoring",
       icon: Activity,
       label: "Monitor",
       isActive:
-        pathname === "/monitoring" || pathname.startsWith("/monitoring/"),
+        pathname === "/health-worker/monitoring" ||
+        pathname.startsWith("/health-worker/monitoring/"),
       requireAuth: true,
     },
     {
-      href: "/records",
+      href: "/health-worker/records",
       icon: FileText,
       label: "Records",
-      isActive: pathname === "/records" || pathname.startsWith("/records/"),
+      isActive:
+        pathname === "/health-worker/records" ||
+        pathname.startsWith("/health-worker/records/"),
       requireAuth: true,
     },
     {

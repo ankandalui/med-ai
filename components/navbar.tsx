@@ -57,10 +57,9 @@ export function Navbar() {
         { name: "Reports", href: "/health-worker/reports" },
       ];
     }
-
     if (user?.userType === "PATIENT") {
       return [
-        { name: "Dashboard", href: "/patient" },
+        { name: "Dashboard", href: "/patient/dashboard" },
         { name: "Medical Records", href: "/patient/locker" },
         { name: "Reminders", href: "/patient/reminders" },
         { name: "Emergency", href: "/patient/emergency" },
@@ -350,28 +349,25 @@ export function Navbar() {
                   </Link>
                 </>
               )}
-
-              {/* Mobile App Download Button - Only show if installable and not installed */}
+              {/* App Download Button - Mobile */}
               {isInstallable && !isInstalled && (
-                <div className="pt-2">
-                  <Button
-                    className={`w-full bg-primary text-primary-foreground hover:bg-primary/90 p-3 font-medium transition-all duration-300 transform shadow-lg ${
-                      isMobileMenuOpen
-                        ? "translate-x-0 opacity-100 scale-100"
-                        : "translate-x-8 opacity-0 scale-95"
-                    }`}
-                    style={{
-                      transitionDelay: isMobileMenuOpen ? "600ms" : "0ms",
-                    }}
-                    onClick={() => {
-                      handleInstallPWA();
-                      setIsMobileMenuOpen(false);
-                    }}
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Download App
-                  </Button>
-                </div>
+                <Button
+                  onClick={() => {
+                    handleInstallPWA();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`w-full bg-primary text-primary-foreground hover:bg-primary/90 p-3 font-medium transition-all duration-300 transform shadow-lg ${
+                    isMobileMenuOpen
+                      ? "translate-x-0 opacity-100 scale-100"
+                      : "translate-x-8 opacity-0 scale-95"
+                  }`}
+                  style={{
+                    transitionDelay: isMobileMenuOpen ? "600ms" : "0ms",
+                  }}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Install App
+                </Button>
               )}
             </div>
           </div>

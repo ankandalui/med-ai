@@ -22,10 +22,12 @@ export function BottomNav() {
       requireAuth: false,
     },
     {
-      href: "/patient",
+      href: "/patient/dashboard",
       icon: Activity,
       label: "Dashboard",
-      isActive: pathname === "/patient" || pathname.startsWith("/patient/"),
+      isActive:
+        pathname === "/patient/dashboard" ||
+        pathname.startsWith("/patient/dashboard"),
       requireAuth: true,
     },
     {

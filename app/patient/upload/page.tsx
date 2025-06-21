@@ -90,10 +90,9 @@ export default function UploadRecordPage() {
       console.warn("❌ No valid files to upload");
       return;
     }
-
-    const newFiles = validFiles.map((file) => ({
+    const newFiles = validFiles.map((file, index) => ({
       file,
-      id: Math.random().toString(36).substr(2, 9),
+      id: `upload-${Date.now()}-${index}`, // Use timestamp + index to avoid hydration issues
       progress: 0,
       status: "pending" as const,
       type: "prescription" as const,

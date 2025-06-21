@@ -99,6 +99,11 @@ model MedicalRecord {
   notes          String?
   attachments    String[] // URLs to uploaded files
   
+  // Blockchain storage fields
+  encrypted      Boolean  @default(false)
+  cid            String?  // IPFS/Lighthouse CID
+  ipfsUrl        String?  // IPFS URL for accessing the record
+  
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   
