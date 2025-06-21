@@ -13,7 +13,6 @@ export function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
-
   const navItems = [
     {
       href: "/",
@@ -26,28 +25,34 @@ export function BottomNav() {
       href: "/ai",
       icon: Stethoscope,
       label: "AI",
-      isActive: pathname === "/ai",
+      isActive:
+        pathname === "/ai" ||
+        pathname === "/symptom-prediction" ||
+        pathname === "/diagnosis" ||
+        pathname === "/disease-prediction" ||
+        pathname.startsWith("/ai/"),
       requireAuth: false,
     },
     {
       href: "/monitoring",
       icon: Activity,
       label: "Monitor",
-      isActive: pathname === "/monitoring",
+      isActive:
+        pathname === "/monitoring" || pathname.startsWith("/monitoring/"),
       requireAuth: true,
     },
     {
       href: "/records",
       icon: FileText,
       label: "Records",
-      isActive: pathname === "/records",
+      isActive: pathname === "/records" || pathname.startsWith("/records/"),
       requireAuth: true,
     },
     {
       href: "/profile",
       icon: User,
       label: "Profile",
-      isActive: pathname === "/profile",
+      isActive: pathname === "/profile" || pathname.startsWith("/profile/"),
       requireAuth: true,
     },
   ];

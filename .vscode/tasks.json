@@ -16,6 +16,14 @@
       "group": "build",
       "isBackground": true,
       "problemMatcher": []
+    },
+    {
+      "label": "Start Symptom API",
+      "type": "shell",
+      "command": "cd symptom && python app.py",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": []
     }
   ]
 }

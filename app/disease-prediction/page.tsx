@@ -12,8 +12,6 @@ import {
   CheckCircle,
   Loader2,
   FileImage,
-  Activity,
-  Clock,
   TrendingUp,
   Shield,
   ArrowLeft,
@@ -27,21 +25,18 @@ interface PredictionResult {
   prediction_id: string;
   prediction: string;
   confidence: number;
-  treatment_info: {
-    description: string;
-    treatment: string;
-    urgency: "low" | "medium" | "high";
-    next_steps: string[];
-  };
   timestamp: string;
   disclaimer: string;
-  model_used: string;
   database_id?: string;
+  storage_secure?: boolean;
+  storage_info?: any;
   ipfs?: {
     hash: string;
     url: string;
     lighthouse_url: string;
   };
+  error?: string;
+  message?: string;
 }
 
 export default function DiseasePredictionPage() {
@@ -82,12 +77,12 @@ export default function DiseasePredictionPage() {
 
     setIsUploading(true);
     setError(null);
-
     try {
       const formData = new FormData();
-      formData.append("file", selectedFile); // Changed from "image" to "file" to match API
-      
-      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.PREDICT), {
+      formData.append("image", selectedFile); // Use "image" for Next.js API proxy
+
+      // Use the Next.js API proxy instead of direct Flask API call
+      const response = await fetch("/api/predict", {
         method: "POST",
         body: formData,
       });
@@ -115,32 +110,6 @@ export default function DiseasePredictionPage() {
     setError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
-    }
-  };
-
-  const getUrgencyColor = (urgency: string) => {
-    switch (urgency) {
-      case "high":
-        return "text-red-600 bg-red-50 border-red-200";
-      case "medium":
-        return "text-yellow-600 bg-yellow-50 border-yellow-200";
-      case "low":
-        return "text-green-600 bg-green-50 border-green-200";
-      default:
-        return "text-gray-600 bg-gray-50 border-gray-200";
-    }
-  };
-
-  const getUrgencyIcon = (urgency: string) => {
-    switch (urgency) {
-      case "high":
-        return <AlertCircle className="w-5 h-5" />;
-      case "medium":
-        return <Clock className="w-5 h-5" />;
-      case "low":
-        return <CheckCircle className="w-5 h-5" />;
-      default:
-        return <Activity className="w-5 h-5" />;
     }
   };
 
@@ -320,7 +289,6 @@ export default function DiseasePredictionPage() {
                   </Button>
                 </div>
               </div>
-
               {/* Main Results */}
               <div className="grid lg:grid-cols-2 gap-6">
                 {/* Image and Basic Results */}
@@ -329,7 +297,6 @@ export default function DiseasePredictionPage() {
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                       Analysis Results
                     </h3>
-
                     {previewUrl && (
                       <div className="mb-6">
                         <Image
@@ -341,7 +308,6 @@ export default function DiseasePredictionPage() {
                         />
                       </div>
                     )}
-
                     <div className="space-y-4">
                       <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
                         <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
@@ -371,170 +337,8 @@ export default function DiseasePredictionPage() {
                     </div>
                   </div>
                 </div>
-                {/* Treatment Information */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                      Treatment Information
-                    </h3>
-
-                    {/* Urgency Level */}
-                    <div
-                      className={`rounded-xl p-4 mb-6 border ${getUrgencyColor(
-                        prediction.treatment_info.urgency
-                      )}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        {getUrgencyIcon(prediction.treatment_info.urgency)}
-                        <div>
-                          <h4 className="font-semibold capitalize">
-                            {prediction.treatment_info.urgency} Priority
-                          </h4>
-                          <p className="text-sm opacity-80">
-                            {prediction.treatment_info.urgency === "high"
-                              ? "Seek immediate medical attention"
-                              : prediction.treatment_info.urgency === "medium"
-                              ? "Schedule an appointment soon"
-                              : "Monitor and consult if needed"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Description */}
-                    <div className="mb-6">
-                      <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-                        Description
-                      </h4>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        {prediction.treatment_info.description}
-                      </p>
-                    </div>
-
-                    {/* Treatment */}
-                    <div className="mb-6">
-                      <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-                        Treatment Approach
-                      </h4>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        {prediction.treatment_info.treatment}
-                      </p>
-                    </div>
-
-                    {/* Next Steps */}
-                    <div>
-                      <h4 className="font-semibold text-gray-900 dark:text-white mb-3">
-                        Recommended Next Steps
-                      </h4>
-                      <ul className="space-y-2">
-                        {prediction.treatment_info.next_steps.map(
-                          (step, index) => (
-                            <li key={index} className="flex items-start gap-3">
-                              <span className="flex-shrink-0 w-6 h-6 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center text-sm font-medium">
-                                {index + 1}
-                              </span>
-                              <span className="text-gray-600 dark:text-gray-300">
-                                {step}
-                              </span>
-                            </li>
-                          )
-                        )}
-                      </ul>
-                    </div>
-                  </div>
-                </div>{" "}
               </div>
-
               {/* Technical Information */}
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-blue-500" />
-                    Analysis Information
-                  </h3>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {/* Model Information */}
-                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
-                      <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">
-                        AI Model
-                      </h4>
-                      <p className="text-blue-800 dark:text-blue-200 text-sm">
-                        {prediction.model_used === "real_ai"
-                          ? "✅ Real AI Model"
-                          : "⚠️ Demo Mode"}
-                      </p>
-                      <p className="text-blue-600 dark:text-blue-400 text-xs mt-1">
-                        Prediction ID: {prediction.prediction_id}
-                      </p>
-                    </div>
-
-                    {/* Database Storage */}
-                    {prediction.database_id && (
-                      <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4">
-                        <h4 className="font-semibold text-green-900 dark:text-green-300 mb-2">
-                          Secure Storage
-                        </h4>
-                        <p className="text-green-800 dark:text-green-200 text-sm">
-                          ✅ Stored in Database
-                        </p>
-                        <p className="text-green-600 dark:text-green-400 text-xs mt-1 font-mono">
-                          ID: {prediction.database_id}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* IPFS Storage */}
-                    {prediction.ipfs && (
-                      <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4 md:col-span-2">
-                        <h4 className="font-semibold text-purple-900 dark:text-purple-300 mb-2">
-                          Blockchain Storage (IPFS)
-                        </h4>
-                        <p className="text-purple-800 dark:text-purple-200 text-sm mb-3">
-                          ✅ Image stored on decentralized IPFS network
-                        </p>
-                        <div className="space-y-2">
-                          <div>
-                            <p className="text-xs text-purple-600 dark:text-purple-400 mb-1">
-                              IPFS Hash:
-                            </p>
-                            <code className="text-xs bg-purple-100 dark:bg-purple-900/50 px-2 py-1 rounded font-mono break-all">
-                              {prediction.ipfs.hash}
-                            </code>
-                          </div>
-                          <div className="flex gap-2 mt-3">
-                            <a
-                              href={prediction.ipfs.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-xs bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/50 dark:hover:bg-purple-900/70 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-md transition-colors"
-                            >
-                              🌐 IPFS Gateway
-                            </a>
-                            <a
-                              href={prediction.ipfs.lighthouse_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-xs bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/50 dark:hover:bg-purple-900/70 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-md transition-colors"
-                            >
-                              ⚡ Lighthouse
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Analysis completed at:{" "}
-                      {new Date(prediction.timestamp).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Disclaimer */}
               <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-6">
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-6 h-6 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />

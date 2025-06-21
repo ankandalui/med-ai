@@ -97,7 +97,6 @@ export default function AIPage() {
                   </p>
                 </div>
               </div>
-
               <div className="space-y-4 mb-8">
                 <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
                   <CheckCircle className="w-4 h-4 text-green-500" />
@@ -112,7 +111,6 @@ export default function AIPage() {
                   Receive recommendations for next steps
                 </div>
               </div>
-
               <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6 mb-6">
                 <div className="flex items-center gap-2 mb-3">
                   <FileText className="w-5 h-5 text-gray-600 dark:text-gray-300" />
@@ -140,11 +138,10 @@ export default function AIPage() {
                     <span>Get personalized health predictions</span>
                   </li>
                 </ol>
-              </div>
-
+              </div>{" "}
               <Button
                 className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg"
-                onClick={() => setActiveSection("symptoms")}
+                onClick={() => (window.location.href = "/symptom-prediction")}
               >
                 Start Symptom Analysis
                 <ArrowRight className="w-4 h-4 ml-2" />

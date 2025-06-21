@@ -42,5 +42,6 @@ next-env.d.ts
 
 /lib/generated/prisma
 
-# Skin folder (Flask API deployment)
+# Python Flask APIs
 /skin
+/dygonisis

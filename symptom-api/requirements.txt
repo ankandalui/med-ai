@@ -1,0 +1,5 @@
+Flask==2.3.2
+flask-cors==3.0.10
+google-generativeai==0.3.2
+googletrans==4.0.0-rc1
+gunicorn==21.0.1
