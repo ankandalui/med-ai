@@ -27,8 +27,9 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
+    }    // Check if OTP bypass is enabled
+    const otpBypassEnabled = process.env.OTP_BYPASS_ENABLED === "true";
+    
     // Generate JWT token
     const token = generateToken({
       userId: user.id,
@@ -36,20 +37,60 @@ export async function POST(request: NextRequest) {
       userType: user.userType,
     });
 
-    return NextResponse.json({
-      message: "Login successful",
-      user: {
-        id: user.id,
-        email: user.email,
-        phone: user.phone,
-        name: user.name,
-        userType: user.userType,
-        isVerified: user.isVerified,
-        ...(user.patient && { patient: user.patient }),
-        ...(user.healthWorker && { healthWorker: user.healthWorker }),
-      },
-      token,
-    });
+    if (otpBypassEnabled) {
+      // Mark user as verified if OTP bypass is enabled
+      if (!user.isVerified) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { isVerified: true },
+        });
+      }
+
+      return NextResponse.json({
+        message: "Login successful",
+        user: {
+          id: user.id,
+          email: user.email,
+          phone: user.phone,
+          name: user.name,
+          userType: user.userType,
+          isVerified: true,
+          ...(user.patient && { patient: user.patient }),
+          ...(user.healthWorker && { healthWorker: user.healthWorker }),
+        },
+        token,
+        otpBypass: true,
+      });
+    } else {
+      // Create OTP verification record for normal flow
+      const { generateOTP } = await import("@/lib/auth");
+      const otp = generateOTP();
+      
+      await prisma.oTPVerification.create({
+        data: {
+          email: user.email,
+          phone: user.phone,
+          otp,
+          expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+        },
+      });
+
+      return NextResponse.json({
+        message: "OTP sent successfully",
+        user: {
+          id: user.id,
+          email: user.email,
+          phone: user.phone,
+          name: user.name,
+          userType: user.userType,
+          isVerified: user.isVerified,
+          ...(user.patient && { patient: user.patient }),
+          ...(user.healthWorker && { healthWorker: user.healthWorker }),
+        },
+        token,
+        otpBypass: false,
+      });
+    }
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
