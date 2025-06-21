@@ -107,5 +107,138 @@
       "invalidAge": "Please enter a valid age (1-120)",
       "locationRequired": "Location is required"
     }
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "locker": "Locker",
+    "reminders": "Reminders",
+    "profile": "Profile",
+    "aiTools": "AI Tools",
+    "monitor": "Monitor",
+    "records": "Records",
+    "patients": "Patients",
+    "appointments": "Appointments",
+    "reports": "Reports",
+    "settings": "Settings",
+    "medicalRecords": "Medical Records",
+    "emergency": "Emergency",
+    "aiAnalysis": "AI Analysis",
+    "diseasePrediction": "Disease Prediction",
+    "symptomAnalysis": "Symptom Analysis",
+    "diagnosis": "Diagnosis"
+  },
+  "common": {
+    "profile": "Profile",
+    "logout": "Logout",
+    "settings": "Settings",
+    "downloadApp": "Download App",
+    "installApp": "Install App",
+    "healthWorker": "Health Worker",
+    "patient": "Patient"
+  },
+  "pages": {
+    "ai": {
+      "title": "Medical AI Assistant",
+      "subtitle": "Get accurate medical predictions using advanced AI technology. Analyze symptoms or diagnose skin conditions with our intelligent healthcare tools.",
+      "features": {
+        "aiPowered": "AI-Powered Analysis",
+        "aiPoweredDesc": "Advanced machine learning algorithms",
+        "medicalAccuracy": "Medical Accuracy",
+        "medicalAccuracyDesc": "Trained on medical datasets",
+        "realTime": "Real-time Results",
+        "realTimeDesc": "Get instant predictions",
+        "reliable": "Reliable Insights",
+        "reliableDesc": "Evidence-based recommendations"
+      },
+      "symptomPrediction": {
+        "title": "Symptom Prediction",
+        "subtitle": "AI-powered symptom analysis",
+        "description": "Describe your symptoms in natural language and get AI-powered medical insights.",
+        "bulletPoints": [
+          "Natural language processing",
+          "Multi-symptom analysis",
+          "Risk assessment",
+          "Treatment suggestions"
+        ],
+        "button": "Analyze Symptoms"
+      },
+      "skinDiagnosis": {
+        "title": "Skin Condition Analysis",
+        "subtitle": "AI dermatology assistant",
+        "description": "Upload images of skin conditions for instant AI analysis and recommendations.",
+        "bulletPoints": [
+          "Image-based diagnosis",
+          "Common skin conditions",
+          "Treatment recommendations",
+          "Severity assessment"
+        ],
+        "button": "Analyze Skin"
+      }
+    },
+    "monitoring": {
+      "title": "Patient Monitoring Dashboard",
+      "subtitle": "Monitor patient health status and emergency cases in real-time",
+      "filters": {
+        "all": "All Patients",
+        "critical": "Critical",
+        "attention": "Needs Attention",
+        "stable": "Stable",
+        "recovered": "Recovered"
+      },
+      "search": "Search patients...",
+      "noPatients": "No patients found",
+      "loadingPatients": "Loading patients...",
+      "patientInfo": {
+        "status": "Status",
+        "symptoms": "Symptoms",
+        "diagnosis": "Diagnosis",
+        "location": "Location",
+        "age": "Age",
+        "phone": "Phone",
+        "emergencyId": "Emergency ID",
+        "lastUpdated": "Last Updated"
+      },
+      "vitals": {
+        "heartRate": "Heart Rate",
+        "bloodPressure": "Blood Pressure",
+        "temperature": "Temperature",
+        "weight": "Weight"
+      },
+      "actions": {
+        "viewDetails": "View Details",
+        "updateStatus": "Update Status",
+        "sendToHospital": "Send to Hospital"
+      }
+    },
+    "records": {
+      "title": "Medical Records",
+      "subtitle": "View and manage patient medical records",
+      "search": "Search records...",
+      "filters": {
+        "all": "All Records",
+        "recent": "Recent",
+        "emergency": "Emergency",
+        "routine": "Routine"
+      },
+      "noRecords": "No medical records found",
+      "loadingRecords": "Loading records...",
+      "recordInfo": {
+        "patient": "Patient",
+        "phone": "Phone",
+        "diagnosis": "Diagnosis",
+        "treatment": "Treatment",
+        "medications": "Medications",
+        "notes": "Notes",
+        "date": "Date",
+        "status": "Status",
+        "healthWorker": "Health Worker"
+      },
+      "actions": {
+        "viewRecord": "View Record",
+        "downloadRecord": "Download Record",
+        "editRecord": "Edit Record"
+      }
+    }
   }
 }

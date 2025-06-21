@@ -288,11 +288,10 @@ export async function POST(request: NextRequest) {
       // Upload medical record to blockchain for security and verification
       try {
         console.log("� Uploading medical record to blockchain...");
-
         const blockchainResult = await uploadMedicalRecordToBlockchain({
           id: medicalRecord.id,
           patientId: medicalRecord.patientId,
-          healthWorkerId: medicalRecord.healthWorkerId,
+          healthWorkerId: medicalRecord.healthWorkerId || "AI_SYSTEM",
           diagnosis: medicalRecord.diagnosis,
           symptoms: medicalRecord.symptoms,
           treatment: medicalRecord.treatment,
@@ -300,10 +299,12 @@ export async function POST(request: NextRequest) {
           notes: medicalRecord.notes || undefined,
           createdAt: medicalRecord.createdAt.toISOString(),
           healthWorker: {
-            name: medicalRecord.healthWorker.user.name,
-            phone: medicalRecord.healthWorker.user.phone,
-            specialization: medicalRecord.healthWorker.specialization,
-            hospital: medicalRecord.healthWorker.hospital || undefined,
+            name: medicalRecord.healthWorker?.user?.name || "AI System",
+            phone: medicalRecord.healthWorker?.user?.phone || "system",
+            specialization:
+              medicalRecord.healthWorker?.specialization ||
+              "Emergency Medicine",
+            hospital: medicalRecord.healthWorker?.hospital || undefined,
           },
           patient: {
             name: medicalRecord.patient.user.name,

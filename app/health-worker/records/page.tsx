@@ -166,11 +166,12 @@ export default function HealthWorkerRecordsPage() {
         {/* Header */}
         <div className="flex flex-col gap-4 mb-6 md:mb-8">
           <div>
+            {" "}
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Patient Records
+              {t("pages.records.title")}
             </h1>
             <p className="text-sm md:text-base text-gray-600 dark:text-gray-300">
-              View and manage all patient medical records and monitoring data
+              {t("pages.records.subtitle")}
             </p>
           </div>
         </div>
@@ -182,7 +183,7 @@ export default function HealthWorkerRecordsPage() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
-                  placeholder="Search by patient name or diagnosis..."
+                  placeholder={t("pages.records.search")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"

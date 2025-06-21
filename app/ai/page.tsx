@@ -21,27 +21,26 @@ export default function AIPage() {
   const [activeSection, setActiveSection] = useState<
     "symptoms" | "disease" | null
   >(null);
-
   const features = [
     {
       icon: Brain,
-      title: "AI-Powered Analysis",
-      desc: "Advanced machine learning algorithms",
+      title: t("pages.ai.features.aiPowered"),
+      desc: t("pages.ai.features.aiPoweredDesc"),
     },
     {
       icon: Stethoscope,
-      title: "Medical Accuracy",
-      desc: "Trained on medical datasets",
+      title: t("pages.ai.features.medicalAccuracy"),
+      desc: t("pages.ai.features.medicalAccuracyDesc"),
     },
     {
       icon: Activity,
-      title: "Real-time Results",
-      desc: "Get instant predictions",
+      title: t("pages.ai.features.realTime"),
+      desc: t("pages.ai.features.realTimeDesc"),
     },
     {
       icon: CheckCircle,
-      title: "Reliable Insights",
-      desc: "Evidence-based recommendations",
+      title: t("pages.ai.features.reliable"),
+      desc: t("pages.ai.features.reliableDesc"),
     },
   ];
 
@@ -49,17 +48,15 @@ export default function AIPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header Section */}
       <div className="container mx-auto px-4 pt-24 pb-8">
+        {" "}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            Medical AI Assistant
+            {t("pages.ai.title")}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Get accurate medical predictions using advanced AI technology.
-            Analyze symptoms or diagnose skin conditions with our intelligent
-            healthcare tools.
+            {t("pages.ai.subtitle")}
           </p>
         </div>
-
         {/* Features Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
           {features.map((feature, index) => (
@@ -77,7 +74,6 @@ export default function AIPage() {
             </div>
           ))}
         </div>
-
         {/* Main AI Tools Section */}
         <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* Symptom Prediction Card */}
@@ -87,28 +83,32 @@ export default function AIPage() {
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
                   <Brain className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-                </div>
+                </div>{" "}
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Symptom Prediction
+                    {t("pages.ai.symptomPrediction.title")}
                   </h2>
                   <p className="text-gray-600 dark:text-gray-300">
-                    AI-powered symptom analysis
+                    {t("pages.ai.symptomPrediction.subtitle")}
                   </p>
                 </div>
-              </div>
+              </div>{" "}
               <div className="space-y-4 mb-8">
                 <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
                   <CheckCircle className="w-4 h-4 text-green-500" />
-                  Describe your symptoms in natural language
+                  {t("pages.ai.symptomPrediction.bulletPoints.0")}
                 </div>
                 <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
                   <CheckCircle className="w-4 h-4 text-green-500" />
-                  Get personalized health insights
+                  {t("pages.ai.symptomPrediction.bulletPoints.1")}
                 </div>
                 <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
                   <CheckCircle className="w-4 h-4 text-green-500" />
-                  Receive recommendations for next steps
+                  {t("pages.ai.symptomPrediction.bulletPoints.2")}
+                </div>
+                <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  {t("pages.ai.symptomPrediction.bulletPoints.3")}
                 </div>
               </div>
               <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6 mb-6">
@@ -143,7 +143,7 @@ export default function AIPage() {
                 className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg"
                 onClick={() => (window.location.href = "/symptom-prediction")}
               >
-                Start Symptom Analysis
+                {t("pages.ai.symptomPrediction.button")}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
@@ -154,30 +154,36 @@ export default function AIPage() {
             <div className="absolute -inset-1 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-300"></div>
             <div className="relative bg-white dark:bg-gray-800 p-8 rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
               <div className="flex items-center gap-4 mb-6">
+                {" "}
                 <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-xl">
                   <Camera className="w-8 h-8 text-green-600 dark:text-green-400" />
-                </div>
+                </div>{" "}
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Skin Disease Detection
+                    {t("pages.ai.skinDiagnosis.title")}
                   </h2>
                   <p className="text-gray-600 dark:text-gray-300">
-                    AI-powered image analysis
+                    {t("pages.ai.skinDiagnosis.subtitle")}
                   </p>
                 </div>
-              </div>
+              </div>{" "}
               <div className="space-y-4 mb-8">
+                {" "}
                 <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
                   <CheckCircle className="w-4 h-4 text-green-500" />
-                  Upload photos of skin conditions
+                  {t("pages.ai.skinDiagnosis.bulletPoints.0")}
                 </div>
                 <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
                   <CheckCircle className="w-4 h-4 text-green-500" />
-                  Get instant AI diagnosis
+                  {t("pages.ai.skinDiagnosis.bulletPoints.1")}
                 </div>
                 <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
                   <CheckCircle className="w-4 h-4 text-green-500" />
-                  Receive treatment recommendations
+                  {t("pages.ai.skinDiagnosis.bulletPoints.2")}
+                </div>
+                <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  {t("pages.ai.skinDiagnosis.bulletPoints.3")}
                 </div>
               </div>
               <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6 mb-6">
@@ -210,13 +216,12 @@ export default function AIPage() {
                 className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg"
                 onClick={() => (window.location.href = "/disease-prediction")}
               >
-                Upload Image for Analysis
+                {t("pages.ai.skinDiagnosis.button")}
                 <Upload className="w-4 h-4 ml-2" />
               </Button>
             </div>
           </div>
         </div>
-
         {/* Important Notice */}
         <div className="max-w-4xl mx-auto mt-12">
           <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-6">

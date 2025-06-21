@@ -18,12 +18,11 @@ export function HealthWorkerBottomNav() {
   if (!isAuthenticated || user?.userType !== "HEALTH_WORKER") {
     return null;
   }
-
   const navItems = [
     {
       href: "/health-worker",
       icon: Home,
-      label: "Home",
+      label: t("navigation.home"),
       isActive:
         pathname === "/health-worker" ||
         pathname === "/health-worker/dashboard",
@@ -32,7 +31,7 @@ export function HealthWorkerBottomNav() {
     {
       href: "/ai",
       icon: Stethoscope,
-      label: "AI",
+      label: t("navigation.aiTools"),
       isActive:
         pathname === "/ai" ||
         pathname === "/symptom-prediction" ||
@@ -44,7 +43,7 @@ export function HealthWorkerBottomNav() {
     {
       href: "/health-worker/monitoring",
       icon: Activity,
-      label: "Monitor",
+      label: t("navigation.monitor"),
       isActive:
         pathname === "/health-worker/monitoring" ||
         pathname.startsWith("/health-worker/monitoring/"),
@@ -53,7 +52,7 @@ export function HealthWorkerBottomNav() {
     {
       href: "/health-worker/records",
       icon: FileText,
-      label: "Records",
+      label: t("navigation.records"),
       isActive:
         pathname === "/health-worker/records" ||
         pathname.startsWith("/health-worker/records/"),
@@ -62,7 +61,7 @@ export function HealthWorkerBottomNav() {
     {
       href: "/profile",
       icon: User,
-      label: "Profile",
+      label: t("navigation.profile"),
       isActive: pathname === "/profile" || pathname.startsWith("/profile/"),
       requireAuth: true,
     },

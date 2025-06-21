@@ -1,0 +1,32 @@
+{
+  "patientName": "Test Patient",
+  "patientPhone": "9876543210",
+  "patientAge": "30",
+  "patientLocation": "Test Location",
+  "diagnosis": "Eczema",
+  "symptoms": "Red, itchy patches on skin",
+  "treatment": "Apply moisturizer and avoid irritants",
+  "medications": "Hydrocortisone cream",
+  "notes": "AI-assisted diagnosis test",
+  "severity": "Medium",
+  "healthWorkerPhone": "",
+  "predictionData": {
+    "prediction": "Eczema",
+    "confidence": 85.5,
+    "predictionId": "test123",
+    "timestamp": "2025-06-22T10:00:00Z"
+  },
+  "verificationData": {
+    "geminiAnalysis": "Test analysis",
+    "medicalTreatmentRequired": false,
+    "severityLevel": "Medium",
+    "verified": true
+  },
+  "imageData": {
+    "ipfs": {
+      "hash": "test-hash",
+      "url": "test-url"
+    },
+    "storageSecure": true
+  }
+}

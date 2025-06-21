@@ -17,14 +17,14 @@ export function BottomNav() {
     {
       href: "/",
       icon: Home,
-      label: "Home",
+      label: t("navigation.home"),
       isActive: pathname === "/",
       requireAuth: false,
     },
     {
       href: "/patient/dashboard",
       icon: Activity,
-      label: "Dashboard",
+      label: t("navigation.dashboard"),
       isActive:
         pathname === "/patient/dashboard" ||
         pathname.startsWith("/patient/dashboard"),
@@ -33,7 +33,7 @@ export function BottomNav() {
     {
       href: "/patient/locker",
       icon: FileText,
-      label: "Locker",
+      label: t("navigation.locker"),
       isActive:
         pathname === "/patient/locker" ||
         pathname.startsWith("/patient/locker"),
@@ -42,7 +42,7 @@ export function BottomNav() {
     {
       href: "/patient/reminders",
       icon: Bell,
-      label: "Reminders",
+      label: t("navigation.reminders"),
       isActive:
         pathname === "/patient/reminders" ||
         pathname.startsWith("/patient/reminders"),
@@ -51,7 +51,7 @@ export function BottomNav() {
     {
       href: "/profile",
       icon: User,
-      label: "Profile",
+      label: t("navigation.profile"),
       isActive: pathname === "/profile" || pathname.startsWith("/profile/"),
       requireAuth: true,
     },

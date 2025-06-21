@@ -48,21 +48,24 @@ export function Navbar() {
     }
     if (user?.userType === "HEALTH_WORKER") {
       return [
-        { name: "Dashboard", href: "/health-worker/dashboard" },
-        { name: "AI Analysis", href: "/ai" },
-        { name: "Disease Prediction", href: "/disease-prediction" },
-        { name: "Symptom Analysis", href: "/symptom-prediction" },
-        { name: "Diagnosis", href: "/diagnosis" },
-        { name: "Patients", href: "/health-worker/patients" },
-        { name: "Reports", href: "/health-worker/reports" },
+        { name: t("navigation.dashboard"), href: "/health-worker/dashboard" },
+        { name: t("navigation.aiAnalysis"), href: "/ai" },
+        {
+          name: t("navigation.diseasePrediction"),
+          href: "/disease-prediction",
+        },
+        { name: t("navigation.symptomAnalysis"), href: "/symptom-prediction" },
+        { name: t("navigation.diagnosis"), href: "/diagnosis" },
+        { name: t("navigation.patients"), href: "/health-worker/patients" },
+        { name: t("navigation.reports"), href: "/health-worker/reports" },
       ];
     }
     if (user?.userType === "PATIENT") {
       return [
-        { name: "Dashboard", href: "/patient/dashboard" },
-        { name: "Medical Records", href: "/patient/locker" },
-        { name: "Reminders", href: "/patient/reminders" },
-        { name: "Emergency", href: "/patient/emergency" },
+        { name: t("navigation.dashboard"), href: "/patient/dashboard" },
+        { name: t("navigation.medicalRecords"), href: "/patient/locker" },
+        { name: t("navigation.reminders"), href: "/patient/reminders" },
+        { name: t("navigation.emergency"), href: "/patient/emergency" },
       ];
     }
 
@@ -147,8 +150,9 @@ export function Navbar() {
                             onClick={() => setIsUserMenuOpen(false)}
                             className="flex items-center px-4 py-2 text-sm hover:bg-accent transition-colors"
                           >
+                            {" "}
                             <User className="w-4 h-4 mr-2" />
-                            Profile
+                            {t("common.profile")}
                           </Link>
                           {user?.userType === "HEALTH_WORKER" && (
                             <Link
@@ -157,7 +161,7 @@ export function Navbar() {
                               className="flex items-center px-4 py-2 text-sm hover:bg-accent transition-colors"
                             >
                               <Settings className="w-4 h-4 mr-2" />
-                              Settings
+                              {t("common.settings")}
                             </Link>
                           )}
                           <button
@@ -165,7 +169,7 @@ export function Navbar() {
                             className="flex items-center w-full px-4 py-2 text-sm hover:bg-accent transition-colors text-left"
                           >
                             <LogOut className="w-4 h-4 mr-2" />
-                            Logout
+                            {t("common.logout")}
                           </button>
                         </div>
                       </div>
@@ -194,7 +198,7 @@ export function Navbar() {
                     className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:scale-105 ml-2"
                   >
                     <Download className="w-4 h-4" />
-                    Download App
+                    {t("common.downloadApp")}
                   </Button>
                 )}
               </div>
@@ -278,11 +282,11 @@ export function Navbar() {
                     <div className="flex-1">
                       <span className="font-medium block">
                         {user?.name || "User"}
-                      </span>
+                      </span>{" "}
                       <span className="text-xs text-muted-foreground">
                         {user?.userType === "HEALTH_WORKER"
-                          ? "Health Worker"
-                          : "Patient"}
+                          ? t("common.healthWorker")
+                          : t("common.patient")}
                       </span>
                     </div>
                   </div>
@@ -294,9 +298,10 @@ export function Navbar() {
                     }
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
+                    {" "}
                     <button className="w-full flex items-center text-left p-3 text-sm font-medium hover:bg-accent rounded-md transition-colors">
                       <User className="w-4 h-4 mr-2" />
-                      Profile
+                      {t("common.profile")}
                     </button>
                   </Link>{" "}
                   <button
@@ -307,7 +312,7 @@ export function Navbar() {
                     className="w-full flex items-center text-left p-3 text-sm font-medium hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 rounded-md transition-colors"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
-                    Logout
+                    {t("common.logout")}
                   </button>
                 </div>
               ) : (
@@ -366,7 +371,7 @@ export function Navbar() {
                   }}
                 >
                   <Download className="w-4 h-4 mr-2" />
-                  Install App
+                  {t("common.installApp")}
                 </Button>
               )}
             </div>

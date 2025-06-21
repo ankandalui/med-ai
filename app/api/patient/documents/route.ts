@@ -98,8 +98,23 @@ export async function DELETE(request: NextRequest) {
         { status: 400 }
       );
     }
-
     console.log("Deleting document with ID:", id);
+
+    // First check if the document exists
+    const existingDocument = await prisma.uploadedDocument.findUnique({
+      where: { id },
+    });
+
+    if (!existingDocument) {
+      console.log("Document not found with ID:", id);
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Document not found",
+        },
+        { status: 404 }
+      );
+    }
 
     const document = await prisma.uploadedDocument.delete({
       where: { id },
@@ -114,8 +129,21 @@ export async function DELETE(request: NextRequest) {
     });
   } catch (error) {
     console.error("Delete document error:", error);
+
+    // Handle Prisma P2025 error (record not found)
+    if (error instanceof Error && "code" in error && error.code === "P2025") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Document not found",
+        },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json(
       {
+        success: false,
         error:
           error instanceof Error ? error.message : "Failed to delete document",
       },

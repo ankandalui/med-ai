@@ -104,5 +104,138 @@
       "invalidAge": "অনুগ্রহ করে একটি বৈধ বয়স লিখুন (১-১২০)",
       "locationRequired": "অবস্থান প্রয়োজন"
     }
+  },
+  "navigation": {
+    "home": "হোম",
+    "dashboard": "ড্যাশবোর্ড",
+    "locker": "লকার",
+    "reminders": "রিমাইন্ডার",
+    "profile": "প্রোফাইল",
+    "aiTools": "AI টুলস",
+    "monitor": "মনিটর",
+    "records": "রেকর্ড",
+    "patients": "রোগী",
+    "appointments": "অ্যাপয়েন্টমেন্ট",
+    "reports": "রিপোর্ট",
+    "settings": "সেটিংস",
+    "medicalRecords": "মেডিকেল রেকর্ড",
+    "emergency": "জরুরী",
+    "aiAnalysis": "AI বিশ্লেষণ",
+    "diseasePrediction": "রোগ পূর্বাভাস",
+    "symptomAnalysis": "উপসর্গ বিশ্লেষণ",
+    "diagnosis": "নির্ণয়"
+  },
+  "common": {
+    "profile": "প্রোফাইল",
+    "logout": "লগ আউট",
+    "settings": "সেটিংস",
+    "downloadApp": "অ্যাপ ডাউনলোড করুন",
+    "installApp": "অ্যাপ ইনস্টল করুন",
+    "healthWorker": "স্বাস্থ্য কর্মী",
+    "patient": "রোগী"
+  },
+  "pages": {
+    "ai": {
+      "title": "মেডিকেল AI সহায়ক",
+      "subtitle": "উন্নত AI প্রযুক্তি ব্যবহার করে সঠিক চিকিৎসা পূর্বাভাস পান। আমাদের বুদ্ধিমান স্বাস্থ্য সরঞ্জামগুলির সাথে লক্ষণ বিশ্লেষণ করুন বা ত্বকের অবস্থা নির্ণয় করুন।",
+      "features": {
+        "aiPowered": "AI-চালিত বিশ্লেষণ",
+        "aiPoweredDesc": "উন্নত মেশিন লার্নিং অ্যালগরিদম",
+        "medicalAccuracy": "চিকিৎসা নির্ভুলতা",
+        "medicalAccuracyDesc": "চিকিৎসা ডেটাসেটে প্রশিক্ষিত",
+        "realTime": "রিয়েল-টাইম ফলাফল",
+        "realTimeDesc": "তাৎক্ষণিক পূর্বাভাস পান",
+        "reliable": "নির্ভরযোগ্য অন্তর্দৃষ্টি",
+        "reliableDesc": "প্রমাণ-ভিত্তিক সুপারিশ"
+      },
+      "symptomPrediction": {
+        "title": "উপসর্গ পূর্বাভাস",
+        "subtitle": "AI-চালিত উপসর্গ বিশ্লেষণ",
+        "description": "আপনার উপসর্গগুলি প্রাকৃতিক ভাষায় বর্ণনা করুন এবং AI-চালিত চিকিৎসা অন্তর্দৃষ্টি পান।",
+        "bulletPoints": [
+          "প্রাকৃতিক ভাষা প্রক্রিয়াকরণ",
+          "বহু-উপসর্গ বিশ্লেষণ",
+          "ঝুঁকি মূল্যায়ন",
+          "চিকিৎসার পরামর্শ"
+        ],
+        "button": "উপসর্গ বিশ্লেষণ করুন"
+      },
+      "skinDiagnosis": {
+        "title": "ত্বকের অবস্থা বিশ্লেষণ",
+        "subtitle": "AI চর্মরোগ বিশেষজ্ঞ সহায়ক",
+        "description": "তাৎক্ষণিক AI বিশ্লেষণ এবং সুপারিশের জন্য ত্বকের অবস্থার ছবি আপলোড করুন।",
+        "bulletPoints": [
+          "ছবি-ভিত্তিক নির্ণয়",
+          "সাধারণ ত্বকের রোগ",
+          "চিকিৎসা সুপারিশ",
+          "গুরুত্ব মূল্যায়ন"
+        ],
+        "button": "ত্বক বিশ্লেষণ করুন"
+      }
+    },
+    "monitoring": {
+      "title": "রোগী মনিটরিং ড্যাশবোর্ড",
+      "subtitle": "রিয়েল-টাইমে রোগীর স্বাস্থ্য অবস্থা এবং জরুরি ক্ষেত্রে নিরীক্ষণ করুন",
+      "filters": {
+        "all": "সব রোগী",
+        "critical": "গুরুতর",
+        "attention": "মনোযোগ প্রয়োজন",
+        "stable": "স্থিতিশীল",
+        "recovered": "সুস্থ হয়েছেন"
+      },
+      "search": "রোগী খুঁজুন...",
+      "noPatients": "কোন রোগী পাওয়া যায়নি",
+      "loadingPatients": "রোগী লোড হচ্ছে...",
+      "patientInfo": {
+        "status": "অবস্থা",
+        "symptoms": "উপসর্গ",
+        "diagnosis": "নির্ণয়",
+        "location": "অবস্থান",
+        "age": "বয়স",
+        "phone": "ফোন",
+        "emergencyId": "জরুরি ID",
+        "lastUpdated": "সর্বশেষ আপডেট"
+      },
+      "vitals": {
+        "heartRate": "হৃদস্পন্দন",
+        "bloodPressure": "রক্তচাপ",
+        "temperature": "তাপমাত্রা",
+        "weight": "ওজন"
+      },
+      "actions": {
+        "viewDetails": "বিস্তারিত দেখুন",
+        "updateStatus": "অবস্থা আপডেট করুন",
+        "sendToHospital": "হাসপাতালে পাঠান"
+      }
+    },
+    "records": {
+      "title": "মেডিকেল রেকর্ড",
+      "subtitle": "রোগীর চিকিৎসা রেকর্ড দেখুন এবং পরিচালনা করুন",
+      "search": "রেকর্ড খুঁজুন...",
+      "filters": {
+        "all": "সব রেকর্ড",
+        "recent": "সাম্প্রতিক",
+        "emergency": "জরুরি",
+        "routine": "নিয়মিত"
+      },
+      "noRecords": "কোন মেডিকেল রেকর্ড পাওয়া যায়নি",
+      "loadingRecords": "রেকর্ড লোড হচ্ছে...",
+      "recordInfo": {
+        "patient": "রোগী",
+        "phone": "ফোন",
+        "diagnosis": "নির্ণয়",
+        "treatment": "চিকিৎসা",
+        "medications": "ওষুধ",
+        "notes": "নোট",
+        "date": "তারিখ",
+        "status": "অবস্থা",
+        "healthWorker": "স্বাস্থ্য কর্মী"
+      },
+      "actions": {
+        "viewRecord": "রেকর্ড দেখুন",
+        "downloadRecord": "রেকর্ড ডাউনলোড করুন",
+        "editRecord": "রেকর্ড সম্পাদনা করুন"
+      }
+    }
   }
 }

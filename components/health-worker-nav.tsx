@@ -17,14 +17,14 @@ export function HealthWorkerNav() {
     {
       href: "/",
       icon: Home,
-      label: "Home",
+      label: t("navigation.home"),
       isActive: pathname === "/",
       requireAuth: false,
     },
     {
       href: "/ai",
       icon: Stethoscope,
-      label: "AI Tools",
+      label: t("navigation.aiTools"),
       isActive:
         pathname === "/ai" ||
         pathname === "/symptom-prediction" ||
@@ -36,7 +36,7 @@ export function HealthWorkerNav() {
     {
       href: "/health-worker/monitoring",
       icon: Activity,
-      label: "Monitor",
+      label: t("navigation.monitor"),
       isActive:
         pathname === "/health-worker/monitoring" ||
         pathname.startsWith("/health-worker/monitoring/"),
@@ -45,7 +45,7 @@ export function HealthWorkerNav() {
     {
       href: "/health-worker/records",
       icon: FileText,
-      label: "Records",
+      label: t("navigation.records"),
       isActive:
         pathname === "/health-worker/records" ||
         pathname.startsWith("/health-worker/records/"),
@@ -54,7 +54,7 @@ export function HealthWorkerNav() {
     {
       href: "/profile",
       icon: User,
-      label: "Profile",
+      label: t("navigation.profile"),
       isActive: pathname === "/profile" || pathname.startsWith("/profile/"),
       requireAuth: true,
     },

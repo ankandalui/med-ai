@@ -477,11 +477,12 @@ export default function MonitoringPage() {
         {/* Header */}{" "}
         <div className="flex flex-col gap-4 mb-6 md:mb-8">
           <div>
+            {" "}
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Patient Monitoring
+              {t("pages.monitoring.title")}
             </h1>
             <p className="text-sm md:text-base text-gray-600 dark:text-gray-300">
-              Monitor and manage patient health status
+              {t("pages.monitoring.subtitle")}
             </p>
           </div>
           <div className="w-full md:w-auto">
@@ -501,7 +502,7 @@ export default function MonitoringPage() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
-                  placeholder="Search patients..."
+                  placeholder={t("pages.monitoring.search")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -525,7 +526,15 @@ export default function MonitoringPage() {
                       : ""
                   }`}
                 >
-                  {filter === "all" ? "All" : filter}
+                  {filter === "all"
+                    ? t("pages.monitoring.filters.all")
+                    : filter === "critical"
+                    ? t("pages.monitoring.filters.critical")
+                    : filter === "attention"
+                    ? t("pages.monitoring.filters.attention")
+                    : filter === "stable"
+                    ? t("pages.monitoring.filters.stable")
+                    : filter}
                 </Button>
               ))}
             </div>
@@ -550,8 +559,9 @@ export default function MonitoringPage() {
           <Card className="p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
+                {" "}
                 <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                  Critical
+                  {t("pages.monitoring.filters.critical")}
                 </p>
                 <p className="text-xl md:text-2xl font-bold text-red-600">
                   {patients.filter((p) => p.status === "critical").length}
@@ -564,8 +574,9 @@ export default function MonitoringPage() {
           <Card className="p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
+                {" "}
                 <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                  Attention
+                  {t("pages.monitoring.filters.attention")}
                 </p>
                 <p className="text-xl md:text-2xl font-bold text-yellow-600">
                   {patients.filter((p) => p.status === "attention").length}

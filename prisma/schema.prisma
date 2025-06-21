@@ -89,8 +89,8 @@ model MedicalRecord {
   patientId      String   @db.ObjectId
   patient        Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
   
-  healthWorkerId String   @db.ObjectId
-  healthWorker   HealthWorker @relation(fields: [healthWorkerId], references: [id])
+  healthWorkerId String?   @db.ObjectId
+  healthWorker   HealthWorker? @relation(fields: [healthWorkerId], references: [id])
   
   diagnosis      String
   symptoms       String[]

@@ -436,23 +436,25 @@ export default function PatientDashboard() {
                     <div>
                       <h3 className="font-medium text-gray-900">
                         {record.diagnosis}
-                      </h3>
+                      </h3>{" "}
                       <p className="text-sm text-gray-600">
-                        By: {record.healthWorker.user.name} (
-                        {record.healthWorker.specialization})
-                      </p>
-                      {record.healthWorker.hospital && (
+                        By: {record.healthWorker?.user?.name || "AI System"} (
+                        {record.healthWorker?.specialization ||
+                          "AI-assisted diagnosis"}
+                        )
+                      </p>{" "}
+                      {record.healthWorker?.hospital && (
                         <p className="text-xs text-gray-500">
-                          {record.healthWorker.hospital}
+                          {record.healthWorker?.hospital}
                         </p>
                       )}
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-gray-600">
                         {formatDate(record.createdAt)}
-                      </p>
+                      </p>{" "}
                       <p className="text-xs text-gray-500">
-                        Contact: {record.healthWorker.user.phone}
+                        Contact: {record.healthWorker?.user?.phone || "system"}
                       </p>
                     </div>
                   </div>
