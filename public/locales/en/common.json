@@ -240,5 +240,25 @@
         "editRecord": "Edit Record"
       }
     }
+  },
+  "voiceAssistant": {
+    "title": "MedAI Assistant",
+    "subtitle": "Voice-powered medical assistant",
+    "listening": "Listening...",
+    "processing": "Processing...",
+    "speaking": "Speaking...",
+    "tapToStart": "Tap to start voice commands",
+    "youSaid": "You said:",
+    "assistant": "Assistant:",
+    "start": "Start",
+    "stop": "Stop",
+    "mute": "Mute",
+    "examples": "Try: \"Go to dashboard\", \"Show my records\", \"Emergency help\"",
+    "greeting": "Hello! I'm your MedAI voice assistant. How can I help you today?",
+    "errors": {
+      "noSpeech": "Sorry, I couldn't hear you clearly. Please try again.",
+      "networkError": "Sorry, something went wrong. Please try again.",
+      "processing": "Sorry, I couldn't process your request. Please try again."
+    }
   }
 }

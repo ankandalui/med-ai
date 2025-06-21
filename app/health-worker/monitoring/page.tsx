@@ -760,7 +760,8 @@ export default function MonitoringPage() {
       {/* Add Patient Dialog */}
       {showAddDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-3 md:p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full max-h-[95vh] md:max-h-[90vh] flex flex-col">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full max-h-[80vh] flex flex-col">
+            {/* Header - Fixed */}
             <div className="p-4 md:p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">
@@ -774,141 +775,147 @@ export default function MonitoringPage() {
                   <X className="w-4 h-4" />
                 </Button>
               </div>
-            </div>{" "}
-            <div className="flex-1 overflow-y-auto p-4 md:p-6">
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            </div>
+
+            {/* Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="p-4 md:p-6">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="patientName">Patient Name *</Label>
+                      <Input
+                        id="patientName"
+                        value={addPatientForm.patientName}
+                        onChange={(e) =>
+                          setAddPatientForm({
+                            ...addPatientForm,
+                            patientName: e.target.value,
+                          })
+                        }
+                        placeholder="Enter patient name"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="patientPhone">Phone Number *</Label>
+                      <Input
+                        id="patientPhone"
+                        value={addPatientForm.patientPhone}
+                        onChange={(e) =>
+                          setAddPatientForm({
+                            ...addPatientForm,
+                            patientPhone: e.target.value,
+                          })
+                        }
+                        placeholder="Enter phone number"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="patientAge">Age</Label>
+                      <Input
+                        id="patientAge"
+                        value={addPatientForm.patientAge}
+                        onChange={(e) =>
+                          setAddPatientForm({
+                            ...addPatientForm,
+                            patientAge: e.target.value,
+                          })
+                        }
+                        placeholder="Enter age"
+                        type="number"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="location">Location</Label>
+                      <Input
+                        id="location"
+                        value={addPatientForm.location}
+                        onChange={(e) =>
+                          setAddPatientForm({
+                            ...addPatientForm,
+                            location: e.target.value,
+                          })
+                        }
+                        placeholder="Enter location"
+                      />
+                    </div>
+                  </div>
+
                   <div>
-                    <Label htmlFor="patientName">Patient Name *</Label>
-                    <Input
-                      id="patientName"
-                      value={addPatientForm.patientName}
+                    <Label htmlFor="symptoms">Symptoms *</Label>
+                    <Textarea
+                      id="symptoms"
+                      value={addPatientForm.symptoms}
                       onChange={(e) =>
                         setAddPatientForm({
                           ...addPatientForm,
-                          patientName: e.target.value,
+                          symptoms: e.target.value,
                         })
                       }
-                      placeholder="Enter patient name"
+                      placeholder="Describe symptoms"
+                      rows={3}
                       required
                     />
                   </div>
+
                   <div>
-                    <Label htmlFor="patientPhone">Phone Number *</Label>
-                    <Input
-                      id="patientPhone"
-                      value={addPatientForm.patientPhone}
+                    <Label htmlFor="diagnosis">Diagnosis *</Label>
+                    <Textarea
+                      id="diagnosis"
+                      value={addPatientForm.diagnosis}
                       onChange={(e) =>
                         setAddPatientForm({
                           ...addPatientForm,
-                          patientPhone: e.target.value,
+                          diagnosis: e.target.value,
                         })
                       }
-                      placeholder="Enter phone number"
+                      placeholder="Enter diagnosis"
+                      rows={3}
                       required
                     />
                   </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="patientAge">Age</Label>
-                    <Input
-                      id="patientAge"
-                      value={addPatientForm.patientAge}
+                    <Label htmlFor="status">Status *</Label>
+                    <select
+                      id="status"
+                      value={addPatientForm.status}
                       onChange={(e) =>
                         setAddPatientForm({
                           ...addPatientForm,
-                          patientAge: e.target.value,
+                          status: e.target.value,
                         })
                       }
-                      placeholder="Enter age"
-                      type="number"
-                    />
+                      className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      required
+                    >
+                      <option value="stable">Stable</option>
+                      <option value="attention">Needs Attention</option>
+                      <option value="critical">Critical</option>
+                    </select>
                   </div>
-                  <div>
-                    <Label htmlFor="location">Location</Label>
-                    <Input
-                      id="location"
-                      value={addPatientForm.location}
-                      onChange={(e) =>
-                        setAddPatientForm({
-                          ...addPatientForm,
-                          location: e.target.value,
-                        })
-                      }
-                      placeholder="Enter location"
-                    />
-                  </div>
-                </div>
 
-                <div>
-                  <Label htmlFor="symptoms">Symptoms *</Label>
-                  <Textarea
-                    id="symptoms"
-                    value={addPatientForm.symptoms}
-                    onChange={(e) =>
-                      setAddPatientForm({
-                        ...addPatientForm,
-                        symptoms: e.target.value,
-                      })
-                    }
-                    placeholder="Describe symptoms"
-                    rows={3}
-                    required
-                  />
+                  {addPatientForm.emergencyId && (
+                    <div>
+                      <Label htmlFor="emergencyId">Emergency ID</Label>
+                      <Input
+                        id="emergencyId"
+                        value={addPatientForm.emergencyId}
+                        readOnly
+                        className="bg-gray-100 dark:bg-gray-700"
+                      />
+                    </div>
+                  )}
                 </div>
-
-                <div>
-                  <Label htmlFor="diagnosis">Diagnosis *</Label>
-                  <Textarea
-                    id="diagnosis"
-                    value={addPatientForm.diagnosis}
-                    onChange={(e) =>
-                      setAddPatientForm({
-                        ...addPatientForm,
-                        diagnosis: e.target.value,
-                      })
-                    }
-                    placeholder="Enter diagnosis"
-                    rows={3}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="status">Status *</Label>
-                  <select
-                    id="status"
-                    value={addPatientForm.status}
-                    onChange={(e) =>
-                      setAddPatientForm({
-                        ...addPatientForm,
-                        status: e.target.value,
-                      })
-                    }
-                    className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    required
-                  >
-                    <option value="stable">Stable</option>
-                    <option value="attention">Needs Attention</option>
-                    <option value="critical">Critical</option>
-                  </select>
-                </div>
-
-                {addPatientForm.emergencyId && (
-                  <div>
-                    <Label htmlFor="emergencyId">Emergency ID</Label>
-                    <Input
-                      id="emergencyId"
-                      value={addPatientForm.emergencyId}
-                      readOnly
-                      className="bg-gray-100 dark:bg-gray-700"
-                    />
-                  </div>
-                )}
               </div>
-            </div>{" "}
+            </div>
+
+            {/* Footer - Fixed */}
             <div className="p-4 md:p-6 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button
@@ -916,7 +923,6 @@ export default function MonitoringPage() {
                   disabled={isAddingPatient}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 order-2 sm:order-1"
                 >
-                  {" "}
                   {isAddingPatient ? (
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   ) : (

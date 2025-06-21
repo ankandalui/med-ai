@@ -8,6 +8,7 @@ import { LanguageSelector } from "@/components/language-selector";
 import { NavigationWrapper } from "@/components/navigation-wrapper";
 import { PWAInstallToast } from "@/components/pwa-install-toast";
 import { PWARegister } from "@/components/pwa-register";
+import { VoiceAssistantProvider } from "@/components/voice-assistant-provider";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -107,10 +108,10 @@ export default function RootLayout({
       >
         <ThemeProvider defaultTheme="system">
           <I18nProvider>
-            <PWARegister />
-            <LanguageSelector /> <Navbar />
+            <PWARegister /> <LanguageSelector /> <Navbar />
             <main className="pb-16 lg:pb-0">{children}</main>
             <NavigationWrapper />
+            {/* <VoiceAssistantProvider /> */}
             <PWAInstallToast />
             <Toaster richColors position="bottom-center" />
           </I18nProvider>
