@@ -27,9 +27,9 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }    // Check if OTP bypass is enabled
+    } // Check if OTP bypass is enabled
     const otpBypassEnabled = process.env.OTP_BYPASS_ENABLED === "true";
-    
+
     // Generate JWT token
     const token = generateToken({
       userId: user.id,
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       // Create OTP verification record for normal flow
       const { generateOTP } = await import("@/lib/auth");
       const otp = generateOTP();
-      
+
       await prisma.oTPVerification.create({
         data: {
           email: user.email,

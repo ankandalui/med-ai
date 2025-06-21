@@ -3,6 +3,7 @@
 ## Quick Deployment to Vercel
 
 ### Prerequisites
+
 - Node.js installed
 - Git repository
 - Vercel account
@@ -11,6 +12,7 @@
 ### Option 1: Automated Deployment (Recommended)
 
 Run the deployment script:
+
 ```powershell
 .\deploy.ps1
 ```
@@ -18,16 +20,19 @@ Run the deployment script:
 ### Option 2: Manual Deployment
 
 1. **Install Vercel CLI** (if not already installed):
+
 ```powershell
 npm install -g vercel
 ```
 
 2. **Build the project locally**:
+
 ```powershell
 npm run build
 ```
 
 3. **Deploy to Vercel**:
+
 ```powershell
 vercel --prod
 ```
@@ -35,6 +40,7 @@ vercel --prod
 ### Option 3: GitHub Integration
 
 1. **Push to GitHub**:
+
 ```powershell
 git add .
 git commit -m "Ready for deployment"
@@ -49,6 +55,7 @@ git push origin main
 ### Environment Variables
 
 Make sure these are set in your Vercel project settings:
+
 - `DATABASE_URL` - Your MongoDB connection string
 - `JWT_SECRET` - Your JWT secret key
 - `OTP_BYPASS_ENABLED` - Set to `true` for development
@@ -57,6 +64,7 @@ Make sure these are set in your Vercel project settings:
 ### Build Configuration
 
 The project is configured with:
+
 - Build command: `npm run vercel-build`
 - Install command: `npm install`
 - Framework: Next.js

@@ -10,33 +10,15 @@ import { Menu, X, Download, User, LogOut, Settings } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { usePWAInstall } from "@/hooks/use-pwa-install";
+import { useAuth } from "@/hooks/use-auth";
 
 export function Navbar() {
   const { t } = useTranslation();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
-  const [user, setUser] = React.useState<any>(null);
-  const { isInstallable, isInstalled, installPWA } = usePWAInstall();
-  // Check authentication status on component mount
-  React.useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        setIsAuthenticated(true);
-        // You can decode the token to get user info if needed
-        const userData = localStorage.getItem("userData");
-        if (userData) {
-          setUser(JSON.parse(userData));
-        }
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  // Close dropdown when clicking outside
+  const { user, isAuthenticated, logout } = useAuth();
+  const { isInstallable, isInstalled, installPWA } = usePWAInstall(); // Close dropdown when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
@@ -48,14 +30,9 @@ export function Navbar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userData");
-    setIsAuthenticated(false);
-    setUser(null);
+    logout();
     setIsUserMenuOpen(false);
-    router.push("/");
   };
   const handleInstallPWA = async () => {
     await installPWA();
@@ -67,8 +44,8 @@ export function Navbar() {
     { name: t("navbar.contact"), href: "/contact" },
   ];
   return (
-    <div className="w-full border-b border-white/20 bg-white/10 backdrop-blur-xl supports-[backdrop-filter]:bg-white/5 fixed top-0 left-0 right-0 z-50 shadow-lg shadow-black/5">
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-blue-500/5"></div>
+    <div className="w-full border-b border-border bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80 fixed top-0 left-0 right-0 z-50 shadow-lg">
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5"></div>
       <div className="container mx-auto px-4 relative">
         {" "}
         <div className="flex h-14 md:h-16 items-center">
@@ -92,11 +69,12 @@ export function Navbar() {
           {/* Desktop Navigation - Center */}
           <div className="flex-grow flex justify-center">
             <nav className="hidden md:flex items-center space-x-10">
+              {" "}
               {navigationItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full"
+                  className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full"
                 >
                   {item.name}
                 </Link>
@@ -154,8 +132,9 @@ export function Navbar() {
                 ) : (
                   /* Login/Signup Buttons */
                   <>
+                    {" "}
                     <Link href="/login">
-                      <button className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2">
+                      <button className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors px-3 py-2">
                         {t("navbar.login")}
                       </button>
                     </Link>
@@ -180,9 +159,9 @@ export function Navbar() {
               {/* Theme and Language (Always visible) */}
               <ThemeToggle />
               <LanguageDropdown />
-              {/* Mobile Menu Button */}
+              {/* Mobile Menu Button */}{" "}
               <button
-                className="md:hidden p-2 rounded-md hover:bg-accent transition-all duration-300"
+                className="md:hidden p-2 rounded-md hover:bg-accent transition-all duration-300 text-foreground"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 aria-label="Toggle menu"
               >
@@ -225,7 +204,7 @@ export function Navbar() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-all duration-300 transform ${
+                  className={`block px-4 py-3 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md transition-all duration-300 transform ${
                     isMobileMenuOpen
                       ? "translate-x-0 opacity-100"
                       : "translate-x-8 opacity-0"
@@ -244,9 +223,8 @@ export function Navbar() {
             {/* Mobile Auth Section */}
             <div className="space-y-3 px-4 pt-4 border-t">
               {isAuthenticated ? (
-                /* Mobile User Menu */
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-3 p-3 bg-accent rounded-md">
+                /* Mobile User Menu */ <div className="space-y-2">
+                  <div className="flex items-center space-x-3 p-3 bg-accent rounded-md border-l-4 border-green-500">
                     <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
                       {user?.name ? (
                         user.name.charAt(0).toUpperCase()
@@ -254,7 +232,14 @@ export function Navbar() {
                         <User className="w-4 h-4" />
                       )}
                     </div>
-                    <span className="font-medium">{user?.name || "User"}</span>
+                    <div className="flex-1">
+                      <span className="font-medium block">
+                        {user?.name || "User"}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        Logged in
+                      </span>
+                    </div>
                   </div>
                   <Link
                     href="/profile"
@@ -264,13 +249,13 @@ export function Navbar() {
                       <User className="w-4 h-4 mr-2" />
                       Profile
                     </button>
-                  </Link>
+                  </Link>{" "}
                   <button
                     onClick={() => {
                       handleLogout();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center text-left p-3 text-sm font-medium hover:bg-accent rounded-md transition-colors"
+                    className="w-full flex items-center text-left p-3 text-sm font-medium hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 rounded-md transition-colors"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout
@@ -284,7 +269,7 @@ export function Navbar() {
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <button
-                      className={`w-full text-left p-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-all duration-300 transform ${
+                      className={`w-full text-left p-3 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md transition-all duration-300 transform ${
                         isMobileMenuOpen
                           ? "translate-x-0 opacity-100 scale-100"
                           : "translate-x-8 opacity-0 scale-95"
