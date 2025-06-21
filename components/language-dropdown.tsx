@@ -5,9 +5,9 @@ import { useTranslation } from "react-i18next";
 import { ChevronDown, Languages } from "lucide-react";
 
 const languages = [
-  { code: "en", name: "English", nativeName: "English", flag: "🇺🇸" },
-  { code: "hi", name: "Hindi", nativeName: "हिंदी", flag: "🇮🇳" },
-  { code: "bn", name: "Bengali", nativeName: "বাংলা", flag: "🇧🇩" },
+  { code: "en", name: "English", nativeName: "English" },
+  { code: "hi", name: "Hindi", nativeName: "हिंदी" },
+  { code: "bn", name: "Bengali", nativeName: "বাংলা" },
 ] as const;
 
 export function LanguageDropdown() {
@@ -29,7 +29,7 @@ export function LanguageDropdown() {
         className="flex items-center space-x-2 px-3 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
       >
         <Languages className="h-4 w-4" />
-        <span className="hidden sm:block">{currentLanguage.flag}</span>
+        <span className="hidden sm:block">{currentLanguage.name}</span>
         <ChevronDown className="h-3 w-3" />
       </button>
 
@@ -48,7 +48,6 @@ export function LanguageDropdown() {
                   i18n.language === language.code ? "bg-accent" : ""
                 }`}
               >
-                <span className="text-base">{language.flag}</span>
                 <div>
                   <div className="font-medium">{language.name}</div>
                   <div className="text-xs text-muted-foreground">

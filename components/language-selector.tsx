@@ -4,9 +4,9 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const languages = [
-  { code: "en", name: "English", nativeName: "English", flag: "🇺🇸" },
-  { code: "hi", name: "Hindi", nativeName: "हिंदी", flag: "🇮🇳" },
-  { code: "bn", name: "Bengali", nativeName: "বাংলা", flag: "🇧🇩" },
+  { code: "en", name: "English", nativeName: "English" },
+  { code: "hi", name: "Hindi", nativeName: "हिंदी" },
+  { code: "bn", name: "Bengali", nativeName: "বাংলা" },
 ] as const;
 
 export function LanguageSelector() {
@@ -47,14 +47,14 @@ export function LanguageSelector() {
               onClick={() => handleLanguageSelect(language.code)}
               className="w-full p-4 text-left border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors group"
             >
-              <div className="flex items-center justify-between">
+              {" "}
+              <div className="flex items-center">
                 <div>
                   <div className="font-medium">{language.name}</div>
                   <div className="text-lg text-muted-foreground group-hover:text-accent-foreground">
                     {language.nativeName}
                   </div>
                 </div>
-                <div className="text-2xl">{language.flag}</div>
               </div>
             </button>
           ))}

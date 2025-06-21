@@ -48,11 +48,10 @@ export default function SymptomPredictionPage() {
   );
   const [playingSection, setPlayingSection] = useState<number | null>(null);
   const recognitionRef = useRef<any>(null);
-
   const languages = [
-    { code: "en", name: "English", flag: "🇺🇸" },
-    { code: "hi", name: "हिंदी", flag: "🇮🇳" },
-    { code: "bn", name: "বাংলা", flag: "🇧🇩" },
+    { code: "en", name: "English" },
+    { code: "hi", name: "हिंदी" },
+    { code: "bn", name: "বাংলা" },
   ];
   const handleSpeechRecognition = () => {
     if (
@@ -284,7 +283,6 @@ export default function SymptomPredictionPage() {
                             : "border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500"
                         }`}
                       >
-                        <span className="text-lg">{lang.flag}</span>
                         <span className="font-medium">{lang.name}</span>
                       </button>
                     ))}
