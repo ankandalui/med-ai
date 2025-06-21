@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum UserType {
+  PATIENT
+  HEALTH_WORKER
+}
+
+model User {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  email       String   @unique
+  phone       String   @unique
+  name        String
+  userType    UserType
+  isVerified  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // User type specific data
+  patient     Patient?
+  healthWorker HealthWorker?
+  
+  @@map("users")
+}
+
+model Patient {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @unique @db.ObjectId
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Patient specific fields - matching signup form
+  gender       String?
+  age          Int?
+  dateOfBirth  DateTime?
+  address      String?   // maps to "location" in form
+  aadharNumber String?
+  familyId     String?
+  
+  // Medical records
+  records      MedicalRecord[]
+  
+  @@map("patients")
+}
+
+model HealthWorker {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String   @unique @db.ObjectId
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Health worker specific fields - matching signup form
+  licenseNumber   String   @unique  // maps to "govHealthWorkerId" in form
+  specialization  String           // maps to "designation" in form
+  areaVillage     String?
+  hospital        String?          // maps to "phcSubcenter" in form
+  aadharNumber    String?
+  
+  // Medical records created by this health worker
+  recordsCreated  MedicalRecord[]
+  
+  @@map("health_workers")
+}
+
+model MedicalRecord {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  patientId      String   @db.ObjectId
+  patient        Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+  healthWorkerId String   @db.ObjectId
+  healthWorker   HealthWorker @relation(fields: [healthWorkerId], references: [id])
+  
+  diagnosis      String
+  symptoms       String[]
+  treatment      String
+  medications    String[]
+  notes          String?
+  attachments    String[] // URLs to uploaded files
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  @@map("medical_records")
+}
+
+model OTPVerification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String?
+  phone     String?
+  otp       String
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  @@map("otp_verifications")
+}

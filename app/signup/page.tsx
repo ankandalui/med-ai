@@ -4,6 +4,7 @@ import * as React from "react";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { LanguageDropdown } from "@/components/language-dropdown";
@@ -53,7 +54,11 @@ interface OTPData {
 
 export default function SignUpPage() {
   const { t } = useTranslation();
-  const [userType, setUserType] = useState<"patient" | "health-worker">("health-worker");  const [formData, setFormData] = useState<FormData>({
+  const router = useRouter();
+  const [userType, setUserType] = useState<"patient" | "health-worker">(
+    "health-worker"
+  );
+  const [formData, setFormData] = useState<FormData>({
     fullName: "",
     mobileNumber: "",
     aadharNumber: "",
@@ -116,13 +121,25 @@ export default function SignUpPage() {
       newErrors.mobileNumber = t("signup.validationErrors.invalidMobileNumber");
     }
 
-    if (!formData.aadharNumber) {
-      newErrors.aadharNumber = t(
-        "signup.validationErrors.aadharNumberRequired"
-      );
-    } else if (!validateAadharNumber(formData.aadharNumber)) {
+    // Aadhar is required for health workers, optional for patients
+    if (userType === "health-worker") {
+      if (!formData.aadharNumber) {
+        newErrors.aadharNumber = t(
+          "signup.validationErrors.aadharNumberRequired"
+        );
+      } else if (!validateAadharNumber(formData.aadharNumber)) {
+        newErrors.aadharNumber = t(
+          "signup.validationErrors.invalidAadharNumber"
+        );
+      }
+    } else if (
+      userType === "patient" &&
+      formData.aadharNumber &&
+      !validateAadharNumber(formData.aadharNumber)
+    ) {
+      // For patients, validate Aadhar only if provided
       newErrors.aadharNumber = t("signup.validationErrors.invalidAadharNumber");
-    }    // Only validate health worker fields when userType is "health-worker"
+    } // Only validate health worker fields when userType is "health-worker"
     if (userType === "health-worker") {
       if (!formData.govHealthWorkerId.trim()) {
         newErrors.govHealthWorkerId = t(
@@ -131,7 +148,9 @@ export default function SignUpPage() {
       }
 
       if (!formData.areaVillage.trim()) {
-        newErrors.areaVillage = t("signup.validationErrors.areaVillageRequired");
+        newErrors.areaVillage = t(
+          "signup.validationErrors.areaVillageRequired"
+        );
       }
 
       if (!formData.phcSubcenter.trim()) {
@@ -141,7 +160,9 @@ export default function SignUpPage() {
       }
 
       if (!formData.designation) {
-        newErrors.designation = t("signup.validationErrors.designationRequired");
+        newErrors.designation = t(
+          "signup.validationErrors.designationRequired"
+        );
       }
     }
 
@@ -153,7 +174,11 @@ export default function SignUpPage() {
 
       if (!formData.age.trim()) {
         newErrors.age = t("signup.validationErrors.ageRequired");
-      } else if (isNaN(Number(formData.age)) || Number(formData.age) < 1 || Number(formData.age) > 120) {
+      } else if (
+        isNaN(Number(formData.age)) ||
+        Number(formData.age) < 1 ||
+        Number(formData.age) > 120
+      ) {
         newErrors.age = t("signup.validationErrors.invalidAge");
       }
 
@@ -195,52 +220,138 @@ export default function SignUpPage() {
     setFormData((prev) => ({ ...prev, profilePhoto: null }));
     setProfilePhotoPreview(null);
   };
-
   const sendOTP = async () => {
     if (!validateForm()) return;
 
     setIsSubmitting(true);
     try {
-      // Simulate API call for OTP
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setOTPData((prev) => ({ ...prev, isOTPSent: true, resendTimer: 30 }));
+      const endpoint =
+        userType === "patient"
+          ? "/api/auth/signup/patient"
+          : "/api/auth/signup/health-worker"; // Prepare data for API
+      const apiData = {
+        name: formData.fullName,
+        email: `${formData.mobileNumber}@temp.com`, // Temporary email based on mobile
+        phone: formData.mobileNumber,
+        ...(userType === "patient"
+          ? {
+              gender: formData.gender,
+              age: formData.age ? parseInt(formData.age) : undefined,
+              dateOfBirth: formData.dateOfBirth || undefined,
+              address: formData.location,
+              aadharNumber: formData.aadharNumber || undefined,
+              familyId: formData.familyId || undefined,
+            }
+          : {
+              licenseNumber: formData.govHealthWorkerId,
+              specialization: formData.designation,
+              qualification: formData.designation,
+              hospital: formData.phcSubcenter,
+              department: formData.areaVillage,
+              areaVillage: formData.areaVillage,
+              aadharNumber: formData.aadharNumber,
+              experience: 0,
+            }),
+      };
 
-      // Start countdown timer
-      const timer = setInterval(() => {
-        setOTPData((prev) => {
-          if (prev.resendTimer <= 1) {
-            clearInterval(timer);
-            return { ...prev, resendTimer: 0 };
-          }
-          return { ...prev, resendTimer: prev.resendTimer - 1 };
-        });
-      }, 1000);
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(apiData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Signup failed");
+      } // Store token
+      localStorage.setItem("token", data.token);
+
+      // Store user data if available
+      if (data.user) {
+        localStorage.setItem("userData", JSON.stringify(data.user));
+      }
+
+      if (data.otpBypass) {
+        // If OTP is bypassed, redirect directly to profile
+        window.location.href = "/profile";
+      } else {
+        // Show OTP form
+        setOTPData((prev) => ({ ...prev, isOTPSent: true, resendTimer: 30 }));
+
+        // Start countdown timer
+        const timer = setInterval(() => {
+          setOTPData((prev) => {
+            if (prev.resendTimer <= 1) {
+              clearInterval(timer);
+              return { ...prev, resendTimer: 0 };
+            }
+            return { ...prev, resendTimer: prev.resendTimer - 1 };
+          });
+        }, 1000);
+      }
     } catch (error) {
       console.error("Error sending OTP:", error);
+      setErrors({
+        general: error instanceof Error ? error.message : "Signup failed",
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
-
   const verifyOTPAndCreateAccount = async () => {
     if (!validateForm()) return;
 
     setOTPData((prev) => ({ ...prev, isVerifying: true }));
     try {
-      // Simulate API call for account creation
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      // Redirect to dashboard or success page
-      console.log("Account created successfully!");
+      const response = await fetch("/api/auth/verify-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: `${formData.mobileNumber}@temp.com`,
+          phone: formData.mobileNumber,
+          otp: otpData.otp,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "OTP verification failed");
+      }
+
+      // Store user data if available
+      if (data.user) {
+        localStorage.setItem("userData", JSON.stringify(data.user));
+      }
+
+      // Redirect to profile page
+      window.location.href = "/profile";
     } catch (error) {
       console.error("Error creating account:", error);
+      setErrors({
+        otp: error instanceof Error ? error.message : "OTP verification failed",
+      });
     } finally {
       setOTPData((prev) => ({ ...prev, isVerifying: false }));
     }
   };
-
   const resendOTP = async () => {
     setOTPData((prev) => ({ ...prev, resendTimer: 30 }));
-    await sendOTP();
+
+    // For development, we'll just restart the timer since OTP is bypassed
+    const timer = setInterval(() => {
+      setOTPData((prev) => {
+        if (prev.resendTimer <= 1) {
+          clearInterval(timer);
+          return { ...prev, resendTimer: 0 };
+        }
+        return { ...prev, resendTimer: prev.resendTimer - 1 };
+      });
+    }, 1000);
   };
   return (
     <div className="min-h-screen bg-background">
@@ -299,8 +410,20 @@ export default function SignUpPage() {
                   </span>
                 </div>
               </div>
-            </div>            <div className="p-8 md:p-12">
+            </div>{" "}
+            <div className="p-8 md:p-12">
               <form className="space-y-8">
+                {/* General Error Display */}
+                {errors.general && (
+                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+                    <div className="flex items-center">
+                      <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
+                      <p className="text-sm text-red-700 dark:text-red-300">
+                        {errors.general}
+                      </p>
+                    </div>
+                  </div>
+                )}
                 {/* User Type Toggle */}
                 <div className="mb-6">
                   <div className="text-center mb-4">
@@ -311,7 +434,7 @@ export default function SignUpPage() {
                       Choose your account type and fill in your details
                     </p>
                   </div>
-                  
+
                   <div className="flex rounded-lg border border-border overflow-hidden mb-6">
                     <button
                       type="button"
@@ -338,16 +461,17 @@ export default function SignUpPage() {
                       <span>Health Worker</span>
                     </button>
                   </div>
-                  
+
                   {userType === "patient" && (
                     <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
                       <p className="text-sm text-blue-700 dark:text-blue-300">
-                        <strong>Patient Registration:</strong> Please fill in your personal details. Health Worker fields will be hidden.
+                        <strong>Patient Registration:</strong> Please fill in
+                        your personal details. Health Worker fields will be
+                        hidden.
                       </p>
                     </div>
                   )}
                 </div>
-
                 {/* Profile Photo Section */}
                 <div className="text-center">
                   <div className="relative inline-block">
@@ -390,7 +514,6 @@ export default function SignUpPage() {
                     {t("signup.profilePhotoDesc")}
                   </p>
                 </div>
-
                 {/* Form Fields Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Full Name */}
@@ -423,7 +546,6 @@ export default function SignUpPage() {
                       </p>
                     )}
                   </div>
-
                   {/* Mobile Number */}
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center">
@@ -454,14 +576,19 @@ export default function SignUpPage() {
                         {errors.mobileNumber}
                       </p>
                     )}
-                  </div>
-
+                  </div>{" "}
                   {/* Aadhar Number */}
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center">
                       <CreditCard className="w-4 h-4 mr-2 text-blue-500" />
                       {t("signup.aadharNumber")}{" "}
-                      <span className="text-red-500 ml-1">*</span>
+                      {userType === "health-worker" ? (
+                        <span className="text-red-500 ml-1">*</span>
+                      ) : (
+                        <span className="text-slate-400 ml-1 text-xs">
+                          (Optional)
+                        </span>
+                      )}
                     </label>
                     <div className="relative">
                       <input
@@ -479,15 +606,19 @@ export default function SignUpPage() {
                           <AlertCircle className="w-5 h-5 text-red-500" />
                         </div>
                       )}
-                    </div>
+                    </div>{" "}
                     {errors.aadharNumber && (
                       <p className="text-sm text-red-500 flex items-center mt-1">
                         <AlertCircle className="w-4 h-4 mr-1" />
                         {errors.aadharNumber}
                       </p>
                     )}
+                    {userType === "patient" && (
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                        Aadhar number is optional for patient registration
+                      </p>
+                    )}
                   </div>
-
                   {/* Patient-specific fields - Only for Patients */}
                   {userType === "patient" && (
                     <>
@@ -509,9 +640,15 @@ export default function SignUpPage() {
                             <option value="">
                               {t("signup.patient.genderPlaceholder")}
                             </option>
-                            <option value="male">{t("signup.patient.genderOptions.male")}</option>
-                            <option value="female">{t("signup.patient.genderOptions.female")}</option>
-                            <option value="other">{t("signup.patient.genderOptions.other")}</option>
+                            <option value="male">
+                              {t("signup.patient.genderOptions.male")}
+                            </option>
+                            <option value="female">
+                              {t("signup.patient.genderOptions.female")}
+                            </option>
+                            <option value="other">
+                              {t("signup.patient.genderOptions.other")}
+                            </option>
                           </select>
                           <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                             <svg
@@ -589,7 +726,9 @@ export default function SignUpPage() {
                             onChange={(e) =>
                               handleInputChange("location", e.target.value)
                             }
-                            placeholder={t("signup.patient.locationPlaceholder")}
+                            placeholder={t(
+                              "signup.patient.locationPlaceholder"
+                            )}
                             className="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                           />
                           {errors.location && (
@@ -619,14 +758,15 @@ export default function SignUpPage() {
                             onChange={(e) =>
                               handleInputChange("familyId", e.target.value)
                             }
-                            placeholder={t("signup.patient.familyIdPlaceholder")}
+                            placeholder={t(
+                              "signup.patient.familyIdPlaceholder"
+                            )}
                             className="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                           />
                         </div>
                       </div>
                     </>
                   )}
-
                   {/* Government Health Worker ID - Only for Health Workers */}
                   {userType === "health-worker" && (
                     <div className="space-y-2">
@@ -640,7 +780,10 @@ export default function SignUpPage() {
                           type="text"
                           value={formData.govHealthWorkerId}
                           onChange={(e) =>
-                            handleInputChange("govHealthWorkerId", e.target.value)
+                            handleInputChange(
+                              "govHealthWorkerId",
+                              e.target.value
+                            )
                           }
                           placeholder={t("signup.govHealthWorkerIdPlaceholder")}
                           className="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
@@ -658,7 +801,8 @@ export default function SignUpPage() {
                         </p>
                       )}
                     </div>
-                  )}                  {/* Area/Village Name - Only for Health Workers */}
+                  )}
+                  {/* Area/Village Name - Only for Health Workers */}
                   {userType === "health-worker" && (
                     <div className="space-y-2">
                       <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center">
@@ -689,7 +833,8 @@ export default function SignUpPage() {
                         </p>
                       )}
                     </div>
-                  )}                  {/* PHC/Sub-center Name - Only for Health Workers */}
+                  )}
+                  {/* PHC/Sub-center Name - Only for Health Workers */}
                   {userType === "health-worker" && (
                     <div className="space-y-2">
                       <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center">
@@ -721,7 +866,8 @@ export default function SignUpPage() {
                       )}
                     </div>
                   )}
-                </div>                {/* Designation - Full Width - Only for Health Workers */}
+                </div>{" "}
+                {/* Designation - Full Width - Only for Health Workers */}
                 {userType === "health-worker" && (
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center">
@@ -775,20 +921,25 @@ export default function SignUpPage() {
                     )}
                   </div>
                 )}
-
                 {/* OTP Section */}
                 {otpData.isOTPSent && (
                   <div className="bg-muted rounded-2xl p-8 border-2 border-border">
                     <div className="text-center mb-6">
                       <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                         <Phone className="w-8 h-8 text-white" />
-                      </div>
+                      </div>{" "}
                       <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">
                         {t("signup.verifyOTP")}
                       </h3>
                       <p className="text-sm text-blue-600 dark:text-blue-400">
                         {t("signup.otpSentTo")} +91 {formData.mobileNumber}
                       </p>
+                      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3 mt-3">
+                        <p className="text-xs text-green-700 dark:text-green-300 text-center">
+                          <strong>Development Mode:</strong> Use OTP code
+                          "123456" for testing
+                        </p>
+                      </div>
                     </div>
                     <div className="space-y-4">
                       <div className="relative">
@@ -835,7 +986,6 @@ export default function SignUpPage() {
                     </div>
                   </div>
                 )}
-
                 {/* Submit Button */}
                 <div className="space-y-6">
                   {!otpData.isOTPSent ? (

@@ -3,9 +3,10 @@
 import * as React from "react";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Phone, Shield, X, User, UserCheck } from "lucide-react";
+import { Phone, Shield, X, User, UserCheck, AlertCircle } from "lucide-react";
 
 interface LoginData {
   mobileNumber: string;
@@ -17,6 +18,7 @@ interface LoginData {
 
 export default function LoginPage() {
   const { t } = useTranslation();
+  const router = useRouter();
   const [userType, setUserType] = useState<"patient" | "health-worker">(
     "patient"
   );
@@ -29,6 +31,7 @@ export default function LoginPage() {
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const validateMobileNumber = (mobile: string): boolean => {
     return /^[6-9]\d{9}$/.test(mobile);
@@ -51,25 +54,54 @@ export default function LoginPage() {
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
-
     setIsSubmitting(true);
     try {
-      // Simulate API call for OTP
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setLoginData((prev) => ({ ...prev, isOTPSent: true, resendTimer: 30 }));
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          phone: loginData.mobileNumber,
+          email: `${loginData.mobileNumber}@temp.com`,
+        }),
+      });
 
-      // Start countdown timer
-      const timer = setInterval(() => {
-        setLoginData((prev) => {
-          if (prev.resendTimer <= 1) {
-            clearInterval(timer);
-            return { ...prev, resendTimer: 0 };
-          }
-          return { ...prev, resendTimer: prev.resendTimer - 1 };
-        });
-      }, 1000);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Login failed");
+      } // Store token
+      localStorage.setItem("token", data.token);
+
+      // Store user data if available
+      if (data.user) {
+        localStorage.setItem("userData", JSON.stringify(data.user));
+      }
+
+      if (data.otpBypass) {
+        // If OTP is bypassed, redirect directly to profile
+        router.push("/profile");
+      } else {
+        // Show OTP form
+        setLoginData((prev) => ({ ...prev, isOTPSent: true, resendTimer: 30 }));
+
+        // Start countdown timer
+        const timer = setInterval(() => {
+          setLoginData((prev) => {
+            if (prev.resendTimer <= 1) {
+              clearInterval(timer);
+              return { ...prev, resendTimer: 0 };
+            }
+            return { ...prev, resendTimer: prev.resendTimer - 1 };
+          });
+        }, 1000);
+      }
     } catch (error) {
       console.error("Error sending OTP:", error);
+      setErrors({
+        general: error instanceof Error ? error.message : "Login failed",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -86,23 +118,54 @@ export default function LoginPage() {
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
-
     setLoginData((prev) => ({ ...prev, isVerifying: true }));
     try {
-      // Simulate API call for login
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      // Redirect to dashboard
-      console.log("Login successful!");
+      const response = await fetch("/api/auth/verify-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: `${loginData.mobileNumber}@temp.com`,
+          phone: loginData.mobileNumber,
+          otp: loginData.otp,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "OTP verification failed");
+      }
+
+      // Store user data if available
+      if (data.user) {
+        localStorage.setItem("userData", JSON.stringify(data.user));
+      }
+
+      // Redirect to profile page
+      router.push("/profile");
     } catch (error) {
       console.error("Error logging in:", error);
+      setErrors({
+        otp: error instanceof Error ? error.message : "OTP verification failed",
+      });
     } finally {
       setLoginData((prev) => ({ ...prev, isVerifying: false }));
     }
   };
-
   const resendOTP = async () => {
     setLoginData((prev) => ({ ...prev, resendTimer: 30 }));
-    await sendOTP();
+
+    // For development, we'll just restart the timer since OTP is bypassed
+    const timer = setInterval(() => {
+      setLoginData((prev) => {
+        if (prev.resendTimer <= 1) {
+          clearInterval(timer);
+          return { ...prev, resendTimer: 0 };
+        }
+        return { ...prev, resendTimer: prev.resendTimer - 1 };
+      });
+    }, 1000);
   };
   return (
     <div className="min-h-screen bg-background">
@@ -160,6 +223,17 @@ export default function LoginPage() {
               </div>
 
               <form className="space-y-6">
+                {/* General Error Display */}
+                {errors.general && (
+                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+                    <div className="flex items-center">
+                      <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
+                      <p className="text-sm text-red-700 dark:text-red-300">
+                        {errors.general}
+                      </p>
+                    </div>
+                  </div>
+                )}
                 {/* Mobile Number */}
                 <div className="space-y-2">
                   {" "}
@@ -182,20 +256,16 @@ export default function LoginPage() {
                       maxLength={10}
                       disabled={loginData.isOTPSent}
                       className="w-full px-4 py-4 rounded-xl border-2 border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    />
+                    />{" "}
                     {errors.mobileNumber && (
                       <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <div className="w-5 h-5 rounded-full bg-destructive/10 flex items-center justify-center">
-                          <X className="w-3 h-3 text-destructive" />
-                        </div>
+                        <AlertCircle className="w-5 h-5 text-red-500" />
                       </div>
                     )}
-                  </div>
+                  </div>{" "}
                   {errors.mobileNumber && (
-                    <p className="text-sm text-destructive flex items-center mt-1">
-                      <div className="w-4 h-4 rounded-full bg-destructive/10 flex items-center justify-center mr-2">
-                        <X className="w-2 h-2 text-destructive" />
-                      </div>
+                    <p className="text-sm text-red-500 flex items-center mt-1">
+                      <AlertCircle className="w-4 h-4 mr-1" />
                       {errors.mobileNumber}
                     </p>
                   )}
@@ -209,10 +279,16 @@ export default function LoginPage() {
                       </div>
                       <h3 className="font-semibold text-foreground mb-1">
                         {t("signup.verifyOTP")}
-                      </h3>
+                      </h3>{" "}
                       <p className="text-sm text-muted-foreground">
                         {t("signup.otpSentTo")} +91 {loginData.mobileNumber}
                       </p>
+                      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3 mt-3">
+                        <p className="text-xs text-green-700 dark:text-green-300 text-center">
+                          <strong>Development Mode:</strong> Use OTP code
+                          "123456" for testing
+                        </p>
+                      </div>
                     </div>
                     <div className="space-y-4">
                       <div className="relative">
@@ -228,20 +304,16 @@ export default function LoginPage() {
                           placeholder={t("signup.otpPlaceholder")}
                           maxLength={6}
                           className="w-full px-4 py-4 rounded-xl border-2 border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all text-center text-xl font-mono tracking-widest"
-                        />
+                        />{" "}
                         {errors.otp && (
                           <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                            <div className="w-5 h-5 rounded-full bg-destructive/10 flex items-center justify-center">
-                              <X className="w-3 h-3 text-destructive" />
-                            </div>
+                            <AlertCircle className="w-5 h-5 text-red-500" />
                           </div>
                         )}
-                      </div>
+                      </div>{" "}
                       {errors.otp && (
-                        <p className="text-sm text-destructive flex items-center justify-center">
-                          <div className="w-4 h-4 rounded-full bg-destructive/10 flex items-center justify-center mr-2">
-                            <X className="w-2 h-2 text-destructive" />
-                          </div>
+                        <p className="text-sm text-red-500 flex items-center justify-center">
+                          <AlertCircle className="w-4 h-4 mr-1" />
                           {errors.otp}
                         </p>
                       )}
@@ -305,6 +377,24 @@ export default function LoginPage() {
                         </>
                       )}
                     </Button>
+                  )}
+
+                  {/* API Error Message */}
+                  {apiError && (
+                    <div className="mt-4 p-4 rounded-lg bg-destructive/10 border border-destructive">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm text-destructive flex items-center">
+                          <AlertCircle className="w-4 h-4 mr-2" />
+                          {apiError}
+                        </p>
+                        <button
+                          onClick={() => setApiError(null)}
+                          className="text-destructive hover:text-destructive/80"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
                   )}
 
                   {/* Sign Up Link */}

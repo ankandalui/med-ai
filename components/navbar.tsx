@@ -2,115 +2,212 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageDropdown } from "@/components/language-dropdown";
 import { useTranslation } from "react-i18next";
-import { Menu, X, Download } from "lucide-react";
+import { Menu, X, Download, User, LogOut, Settings } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { usePWAInstall } from "@/hooks/use-pwa-install";
 
 export function Navbar() {
   const { t } = useTranslation();
+  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [user, setUser] = React.useState<any>(null);
   const { isInstallable, isInstalled, installPWA } = usePWAInstall();
+  // Check authentication status on component mount
+  React.useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        setIsAuthenticated(true);
+        // You can decode the token to get user info if needed
+        const userData = localStorage.getItem("userData");
+        if (userData) {
+          setUser(JSON.parse(userData));
+        }
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest(".user-dropdown")) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userData");
+    setIsAuthenticated(false);
+    setUser(null);
+    setIsUserMenuOpen(false);
+    router.push("/");
+  };
+  const handleInstallPWA = async () => {
+    await installPWA();
+  };
 
   const navigationItems = [
     { name: t("navbar.features"), href: "/features" },
     { name: t("navbar.about"), href: "/about" },
     { name: t("navbar.contact"), href: "/contact" },
   ];
-
-  const handleInstallPWA = async () => {
-    await installPWA();
-  };
   return (
     <div className="w-full border-b border-white/20 bg-white/10 backdrop-blur-xl supports-[backdrop-filter]:bg-white/5 fixed top-0 left-0 right-0 z-50 shadow-lg shadow-black/5">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-blue-500/5"></div>
       <div className="container mx-auto px-4 relative">
-        <div className="flex h-14 md:h-16 items-center justify-between">
+        {" "}
+        <div className="flex h-14 md:h-16 items-center">
           {/* Logo - Left */}
-          <Link href="/" className="flex items-center">
-            <div className="w-10 h-10 flex items-center justify-center">
-              <Image
-                src="/icons/medailogo.svg"
-                alt="MedAI Logo"
-                width={32}
-                height={32}
-                className=""
-              />
-            </div>
-            <span className="font-bold text-xl md:text-2xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              MedAI
-            </span>
-          </Link>
-          {/* Desktop Navigation - Center (Hidden on mobile) */}
-          <nav className="hidden md:flex items-center space-x-6">
-            {navigationItems.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {item.name}
-              </Link>
-            ))}
-          </nav>
-          {/* Right Side - Theme, Language, Auth */}
-          <div className="flex items-center space-x-2">
-            {/* Desktop Auth Buttons (Hidden on mobile) */}{" "}
-            <div className="hidden md:flex items-center space-x-3">
-              <Link href="/login">
-                <button className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2">
-                  {t("navbar.login")}
-                </button>
-              </Link>
-              <Link href="/signup">
-                <button className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md text-sm font-medium transition-colors">
-                  {t("navbar.signUp")}
-                </button>
-              </Link>
-              {/* App Download Button - Only show if installable and not installed */}
-              {isInstallable && !isInstalled && (
-                <Button
-                  onClick={handleInstallPWA}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:scale-105 ml-2"
-                >
-                  <Download className="w-4 h-4" />
-                  Download App
-                </Button>
-              )}
-            </div>
-            {/* Theme and Language (Always visible) */}
-            <ThemeToggle />
-            <LanguageDropdown />
-            {/* Mobile Menu Button */}
-            <button
-              className="md:hidden p-2 rounded-md hover:bg-accent transition-all duration-300"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              <div className="relative w-5 h-5">
-                <span
-                  className={`absolute inset-0 transition-all duration-300 ease-in-out ${
-                    isMobileMenuOpen
-                      ? "rotate-45 opacity-0"
-                      : "rotate-0 opacity-100"
-                  }`}
-                >
-                  <Menu className="h-5 w-5" />
-                </span>
-                <span
-                  className={`absolute inset-0 transition-all duration-300 ease-in-out ${
-                    isMobileMenuOpen
-                      ? "rotate-0 opacity-100"
-                      : "-rotate-45 opacity-0"
-                  }`}
-                >
-                  <X className="h-5 w-5" />
-                </span>
+          <div className="flex-shrink-0">
+            <Link href="/" className="flex items-center">
+              <div className="w-10 h-10 flex items-center justify-center">
+                <Image
+                  src="/icons/medailogo.svg"
+                  alt="MedAI Logo"
+                  width={32}
+                  height={32}
+                  className=""
+                />
               </div>
-            </button>
+              <span className="font-bold text-xl md:text-2xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                MedAI
+              </span>
+            </Link>
+          </div>{" "}
+          {/* Desktop Navigation - Center */}
+          <div className="flex-grow flex justify-center">
+            <nav className="hidden md:flex items-center space-x-10">
+              {navigationItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full"
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </nav>{" "}
+          </div>
+          {/* Right Side - Theme, Language, Auth */}
+          <div className="flex-shrink-0">
+            <div className="flex items-center space-x-2">
+              {/* Desktop Auth Section (Hidden on mobile) */}
+              <div className="hidden md:flex items-center space-x-3">
+                {" "}
+                {isAuthenticated ? (
+                  /* User Avatar Dropdown */
+                  <div className="relative user-dropdown">
+                    <button
+                      onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                      className="flex items-center space-x-2 p-2 rounded-full hover:bg-accent transition-colors"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
+                        {user?.name ? (
+                          user.name.charAt(0).toUpperCase()
+                        ) : (
+                          <User className="w-4 h-4" />
+                        )}
+                      </div>
+                      <span className="text-sm font-medium hidden lg:block">
+                        {user?.name || "User"}
+                      </span>
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    {isUserMenuOpen && (
+                      <div className="absolute right-0 mt-2 w-48 bg-card border rounded-lg shadow-lg z-50">
+                        <div className="py-1">
+                          <Link
+                            href="/profile"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="flex items-center px-4 py-2 text-sm hover:bg-accent transition-colors"
+                          >
+                            <User className="w-4 h-4 mr-2" />
+                            Profile
+                          </Link>
+                          <button
+                            onClick={handleLogout}
+                            className="flex items-center w-full px-4 py-2 text-sm hover:bg-accent transition-colors text-left"
+                          >
+                            <LogOut className="w-4 h-4 mr-2" />
+                            Logout
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  /* Login/Signup Buttons */
+                  <>
+                    <Link href="/login">
+                      <button className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2">
+                        {t("navbar.login")}
+                      </button>
+                    </Link>
+                    <Link href="/signup">
+                      <button className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                        {t("navbar.signUp")}
+                      </button>
+                    </Link>
+                  </>
+                )}
+                {/* App Download Button - Only show if installable and not installed */}
+                {isInstallable && !isInstalled && (
+                  <Button
+                    onClick={handleInstallPWA}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:scale-105 ml-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download App
+                  </Button>
+                )}
+              </div>
+              {/* Theme and Language (Always visible) */}
+              <ThemeToggle />
+              <LanguageDropdown />
+              {/* Mobile Menu Button */}
+              <button
+                className="md:hidden p-2 rounded-md hover:bg-accent transition-all duration-300"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                <div className="relative w-5 h-5">
+                  <span
+                    className={`absolute inset-0 transition-all duration-300 ease-in-out ${
+                      isMobileMenuOpen
+                        ? "rotate-45 opacity-0"
+                        : "rotate-0 opacity-100"
+                    }`}
+                  >
+                    <Menu className="h-5 w-5" />
+                  </span>
+                  <span
+                    className={`absolute inset-0 transition-all duration-300 ease-in-out ${
+                      isMobileMenuOpen
+                        ? "rotate-0 opacity-100"
+                        : "-rotate-45 opacity-0"
+                    }`}
+                  >
+                    <X className="h-5 w-5" />
+                  </span>
+                </div>{" "}
+              </button>
+            </div>
           </div>
         </div>{" "}
         {/* Mobile Menu with Animation */}
@@ -144,37 +241,81 @@ export function Navbar() {
                 </Link>
               ))}
             </div>{" "}
-            {/* Mobile Auth Buttons */}
+            {/* Mobile Auth Section */}
             <div className="space-y-3 px-4 pt-4 border-t">
-              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                <button
-                  className={`w-full text-left p-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-all duration-300 transform ${
-                    isMobileMenuOpen
-                      ? "translate-x-0 opacity-100 scale-100"
-                      : "translate-x-8 opacity-0 scale-95"
-                  }`}
-                  style={{
-                    transitionDelay: isMobileMenuOpen ? "400ms" : "0ms",
-                  }}
-                >
-                  {t("navbar.login")}
-                </button>
-              </Link>
-              <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}>
-                <button
-                  className={`w-full bg-primary text-primary-foreground hover:bg-primary/90 p-3 rounded-md font-medium transition-all duration-300 transform shadow-lg ${
-                    isMobileMenuOpen
-                      ? "translate-x-0 opacity-100 scale-100"
-                      : "translate-x-8 opacity-0 scale-95"
-                  }`}
-                  style={{
-                    transitionDelay: isMobileMenuOpen ? "500ms" : "0ms",
-                  }}
-                >
-                  {" "}
-                  {t("navbar.signUp")}
-                </button>{" "}
-              </Link>
+              {isAuthenticated ? (
+                /* Mobile User Menu */
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-3 p-3 bg-accent rounded-md">
+                    <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
+                      {user?.name ? (
+                        user.name.charAt(0).toUpperCase()
+                      ) : (
+                        <User className="w-4 h-4" />
+                      )}
+                    </div>
+                    <span className="font-medium">{user?.name || "User"}</span>
+                  </div>
+                  <Link
+                    href="/profile"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <button className="w-full flex items-center text-left p-3 text-sm font-medium hover:bg-accent rounded-md transition-colors">
+                      <User className="w-4 h-4 mr-2" />
+                      Profile
+                    </button>
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full flex items-center text-left p-3 text-sm font-medium hover:bg-accent rounded-md transition-colors"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                /* Mobile Login/Signup Buttons */
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <button
+                      className={`w-full text-left p-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-all duration-300 transform ${
+                        isMobileMenuOpen
+                          ? "translate-x-0 opacity-100 scale-100"
+                          : "translate-x-8 opacity-0 scale-95"
+                      }`}
+                      style={{
+                        transitionDelay: isMobileMenuOpen ? "400ms" : "0ms",
+                      }}
+                    >
+                      {t("navbar.login")}
+                    </button>
+                  </Link>
+                  <Link
+                    href="/signup"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <button
+                      className={`w-full bg-primary text-primary-foreground hover:bg-primary/90 p-3 rounded-md font-medium transition-all duration-300 transform shadow-lg ${
+                        isMobileMenuOpen
+                          ? "translate-x-0 opacity-100 scale-100"
+                          : "translate-x-8 opacity-0 scale-95"
+                      }`}
+                      style={{
+                        transitionDelay: isMobileMenuOpen ? "500ms" : "0ms",
+                      }}
+                    >
+                      {t("navbar.signUp")}
+                    </button>
+                  </Link>
+                </>
+              )}
+
               {/* Mobile App Download Button - Only show if installable and not installed */}
               {isInstallable && !isInstalled && (
                 <div className="pt-2">
