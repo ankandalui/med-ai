@@ -7,7 +7,6 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageDropdown } from "@/components/language-dropdown";
 import { useTranslation } from "react-i18next";
 import { Menu, X, Download, User, LogOut, Settings } from "lucide-react";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { usePWAInstall } from "@/hooks/use-pwa-install";
 import { useAuth } from "@/hooks/use-auth";
@@ -82,18 +81,15 @@ export function Navbar() {
           {/* Logo - Left */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
-              <div className="w-10 h-10 flex items-center justify-center">
-                <Image
-                  src="/icons/medailogo.svg"
-                  alt="MedAI Logo"
-                  width={32}
-                  height={32}
-                  className=""
+              <div className="w-28 h-28 md:w-32 md:h-32 flex items-center justify-center">
+                <img
+                  src="/icons/logo.svg"
+                  alt="Chikit-সা Logo"
+                  width={128}
+                  height={128}
+                  className="object-contain"
                 />
               </div>
-              <span className="font-bold text-xl md:text-2xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                MedAI
-              </span>
             </Link>
           </div>{" "}
           {/* Desktop Navigation - Center */}
