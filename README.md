@@ -1,8 +1,8 @@
-# MedAI Project Overview
+# Chikit-সা Project Overview
 
 ## 🚀 Project Summary
 
-MedAI is an AI-powered healthcare platform designed to revolutionize diagnosis, monitoring, and emergency response. It integrates modern web technologies, real-time patient monitoring, voice assistant features, and AI-driven symptom/skin disease prediction, providing a seamless experience for patients, health workers, and authorities.
+Chikit-সা is an AI-powered healthcare platform designed to revolutionize diagnosis, monitoring, and emergency response. It integrates modern web technologies, real-time patient monitoring, voice assistant features, and AI-driven symptom/skin disease prediction, providing a seamless experience for patients, health workers, and authorities.
 
 ---
 
@@ -39,7 +39,7 @@ MedAI is an AI-powered healthcare platform designed to revolutionize diagnosis, 
 ## 🏗️ Project Structure
 
 ```
-med-ai/
+chikit-sa/
 │
 ├── app/                        # Next.js app directory
 │   ├── api/                    # API routes (auth, emergency, health, etc.)
