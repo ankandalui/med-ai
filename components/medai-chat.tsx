@@ -125,10 +125,89 @@ const MedAIChat: React.FC = () => {
     window.speechSynthesis.speak(utterance);
   };
 
+  // Gemini API integration
+  const callGeminiAPI = async (text: string, language: string) => {
+    const GEMINI_API_KEY =
+      process.env.GEMINI_API_KEY || "AIzaSyDNIFMMf99ovvEH65RnIQZf67rkZVm2VYk";
+
+    const systemPrompts = {
+      en: "You are MedAI, a helpful medical assistant for rural communities. Provide clear, accurate health information and advice. Always remind users to consult healthcare professionals for serious concerns. Keep responses concise and easy to understand.",
+      hi: "आप MedAI हैं, ग्रामीण समुदायों के लिए एक सहायक चिकित्सा सहायक। स्पष्ट, सटीक स्वास्थ्य जानकारी और सलाह प्रदान करें। हमेशा उपयोगकर्ताओं को गंभीर चिंताओं के लिए स्वास्थ्य पेशेवरों से सलाह लेने की याद दिलाएं।",
+      bn: "আপনি MedAI, গ্রামীণ সম্প্রদায়ের জন্য একটি সহায়ক চিকিৎসা সহায়ক। স্পষ্ট, নির্ভুল স্বাস্থ্য তথ্য এবং পরামর্শ প্রদান করুন। সর্বদা ব্যবহারকারীদের গুরুতর উদ্বেগের জন্য স্বাস্থ্যসেবা পেশাদারদের সাথে পরামর্শ করার কথা মনে করিয়ে দিন।",
+    };
+
+    const systemPrompt =
+      systemPrompts[language as keyof typeof systemPrompts] || systemPrompts.en;
+    const prompt = `${systemPrompt}\n\nUser question: ${text}\n\nPlease respond in ${
+      language === "hi" ? "Hindi" : language === "bn" ? "Bengali" : "English"
+    }.`;
+
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: prompt,
+                  },
+                ],
+              },
+            ],
+            generationConfig: {
+              temperature: 0.7,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 1024,
+            },
+            safetySettings: [
+              {
+                category: "HARM_CATEGORY_HARASSMENT",
+                threshold: "BLOCK_MEDIUM_AND_ABOVE",
+              },
+              {
+                category: "HARM_CATEGORY_HATE_SPEECH",
+                threshold: "BLOCK_MEDIUM_AND_ABOVE",
+              },
+              {
+                category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                threshold: "BLOCK_MEDIUM_AND_ABOVE",
+              },
+              {
+                category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                threshold: "BLOCK_MEDIUM_AND_ABOVE",
+              },
+            ],
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return (
+        data.candidates?.[0]?.content?.parts?.[0]?.text ||
+        "I apologize, but I could not generate a proper response. Please try again."
+      );
+    } catch (error) {
+      console.error("Gemini API error:", error);
+      throw error;
+    }
+  };
+
   // Send message
   const sendMessage = async () => {
     const text = userInput.trim();
     if (!text) return;
+
     setChatHistory((prev) => [
       ...prev,
       { text, sender: "user", language: currentLanguage },
@@ -136,18 +215,40 @@ const MedAIChat: React.FC = () => {
     setUserInput("");
     setIsTyping(true);
 
-    // Simulate API call with timeout
-    setTimeout(() => {
-      setIsTyping(false);
+    try {
+      const aiResponse = await callGeminiAPI(text, currentLanguage);
+
       setChatHistory((prev) => [
         ...prev,
         {
-          text: "I understand your health concern. As an AI assistant, I can provide general information, but please consult with a healthcare professional for proper medical advice. What specific symptoms are you experiencing?",
+          text: aiResponse,
           sender: "bot",
           language: currentLanguage,
         },
       ]);
-    }, 1500);
+    } catch (error) {
+      console.error("Chat error:", error);
+
+      // Error messages in different languages
+      const errorMessages = {
+        en: "❌ Sorry, I'm having trouble connecting right now. Please try again.",
+        hi: "❌ क्षमा करें, मुझे अभी कनेक्ट करने में समस्या हो रही है। कृपया पुनः प्रयास करें।",
+        bn: "❌ দুঃখিত, আমার এখন সংযোগে সমস্যা হচ্ছে। অনুগ্রহ করে আবার চেষ্টা করুন।",
+      };
+
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          text:
+            errorMessages[currentLanguage as keyof typeof errorMessages] ||
+            errorMessages.en,
+          sender: "bot",
+          language: currentLanguage,
+        },
+      ]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   // Clear chat

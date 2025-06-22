@@ -500,32 +500,116 @@ export default function HealthRemindersPage() {
           </div>
         )}
 
-        {/* Add/Edit Form Modal (placeholder) */}
+        {/* Add/Edit Form Modal (frontend only) */}
         {(showAddForm || editingReminder) && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 {editingReminder ? "Edit Reminder" : "Add New Reminder"}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                Reminder form would go here... This is a placeholder for the
-                actual form implementation.
-              </p>
-              <div className="flex gap-3">
-                <Button
-                  onClick={() => {
-                    setShowAddForm(false);
-                    setEditingReminder(null);
-                  }}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  Cancel
-                </Button>
-                <Button className="flex-1">
-                  {editingReminder ? "Update" : "Create"} Reminder
-                </Button>
-              </div>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setShowAddForm(false);
+                  setEditingReminder(null);
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full rounded-lg border px-3 py-2 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                    placeholder="e.g. Take medicine, Doctor appointment"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Type</label>
+                  <select
+                    className="w-full rounded-lg border px-3 py-2 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    {reminderTypes.map((type) => (
+                      <option key={type.value} value={type.value}>
+                        {type.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Date</label>
+                  <input
+                    type="date"
+                    className="w-full rounded-lg border px-3 py-2 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Time</label>
+                  <input
+                    type="time"
+                    className="w-full rounded-lg border px-3 py-2 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Frequency
+                  </label>
+                  <select
+                    className="w-full rounded-lg border px-3 py-2 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="once">Once</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Priority
+                  </label>
+                  <select
+                    className="w-full rounded-lg border px-3 py-2 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    className="w-full rounded-lg border px-3 py-2 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={2}
+                    placeholder="Add any notes or instructions..."
+                  />
+                </div>
+                <div className="flex gap-3 mt-6">
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setShowAddForm(false);
+                      setEditingReminder(null);
+                    }}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" className="flex-1">
+                    {editingReminder ? "Update" : "Create"} Reminder
+                  </Button>
+                </div>
+              </form>
             </div>
           </div>
         )}

@@ -1,5 +1,9 @@
 # Chikit-সা Project Overview
 
+## 🎬 Demo Video (Autoplay)
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/JwAlh-XVoWM?autoplay=1" title="YouTube video player" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+
 ## 🚀 Project Summary
 
 Chikit-সা is an AI-powered healthcare platform designed to revolutionize diagnosis, monitoring, and emergency response. It integrates modern web technologies, real-time patient monitoring, voice assistant features, and AI-driven symptom/skin disease prediction, providing a seamless experience for patients, health workers, and authorities.

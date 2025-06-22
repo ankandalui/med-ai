@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://med-ai-first.vercel.app"),
+  metadataBase: new URL("https://104ljjhz-3000.inc1.devtunnels.ms"),
   alternates: {
     canonical: "/",
   },
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     title: "MedAI - AI-Powered Healthcare",
     description:
       "Revolutionizing healthcare with AI-powered diagnosis, monitoring, and personalized medical care.",
-    url: "https://med-ai-first.vercel.app",
+    url: "https://104ljjhz-3000.inc1.devtunnels.ms",
     siteName: "MedAI",
     locale: "en_US",
     type: "website",
