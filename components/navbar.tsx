@@ -91,11 +91,10 @@ export function Navbar() {
                 />
               </div>
             </Link>
-          </div>{" "}
+          </div>
           {/* Desktop Navigation - Center */}
           <div className="flex-grow flex justify-center">
             <nav className="hidden md:flex items-center space-x-10">
-              {" "}
               {navigationItems.map((item) => (
                 <Link
                   key={item.name}
