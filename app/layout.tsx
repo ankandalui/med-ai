@@ -10,6 +10,7 @@ import { PWAInstallToast } from "@/components/pwa-install-toast";
 import { PWARegister } from "@/components/pwa-register";
 import { VoiceAssistantProvider } from "@/components/voice-assistant-provider";
 import { Toaster } from "sonner";
+import MedAIChat from "@/components/medai-chat";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -114,6 +115,7 @@ export default function RootLayout({
             {/* <VoiceAssistantProvider /> */}
             <PWAInstallToast />
             <Toaster richColors position="bottom-center" />
+            <MedAIChat />
           </I18nProvider>
         </ThemeProvider>
       </body>
