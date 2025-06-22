@@ -130,6 +130,23 @@ export default function DiseasePredictionPage() {
     setIsUploading(true);
     setError(null);
     try {
+      // Step 1: Gemini API check for group/person
+      const geminiCheckForm = new FormData();
+      geminiCheckForm.append("image", selectedFile);
+      const geminiRes = await fetch("/api/gemini-image-check", {
+        method: "POST",
+        body: geminiCheckForm,
+      });
+      const geminiData = await geminiRes.json();
+      if (!geminiData.success || geminiData.containsGroup) {
+        setIsUploading(false);
+        setError(
+          geminiData.error ||
+            "Only single-person skin images are allowed. Please upload a clear image of the affected skin area."
+        );
+        return;
+      }
+
       const formData = new FormData();
       formData.append("image", selectedFile); // Use "image" for Next.js API proxy
 

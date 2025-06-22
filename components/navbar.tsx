@@ -85,8 +85,8 @@ export function Navbar() {
                 <img
                   src="/icons/logo.svg"
                   alt="Chikit-সা Logo"
-                  width={128}
-                  height={128}
+                  width={150}
+                  height={150}
                   className="object-contain"
                 />
               </div>
@@ -104,7 +104,7 @@ export function Navbar() {
                   {item.name}
                 </Link>
               ))}
-            </nav>{" "}
+            </nav>
           </div>
           {/* Right Side - Theme, Language, Auth */}
           <div className="flex-shrink-0">
