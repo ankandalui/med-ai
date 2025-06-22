@@ -28,7 +28,7 @@ export function Hero() {
                 </PointerHighlight>
               </div>
             </h1>
-            <p className="text-xl sm:text-2xl md:text-2xl text-muted-foreground max-w-3xl mx-auto px-4 font-medium">
+            <p className="text-xl sm:text-2xl md:text-2xl text-black dark:text-gray-200 max-w-3xl mx-auto px-4 font-medium">
               {t("homepage.subtitle")}
             </p>
           </div>{" "}
